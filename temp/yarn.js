@@ -8,11 +8,13 @@ const path = require("path");
 const electronVersion_1 = require("../electron/electronVersion");
 const electronRebuild = require("@electron/rebuild");
 const searchModule = require("@electron/rebuild/lib/src/search-module");
-async function installOrRebuild(config, appDir, options, forceInstall = false) {
-console.log("install or rebuild", { config, options })
+async function installOrRebuild(config, paths, options, forceInstall = false) {
+console.log("install or rebuild", { config, options });
+    const { appDir, projectDir } = paths;
     let isDependenciesInstalled = false;
     for (const fileOrDir of ["node_modules", ".pnp.js"]) {
-        if (await (0, fs_extra_1.pathExists)(path.join(appDir, fileOrDir))) {
+        if (await (0, fs_extra_1.pathExists)(path.join(projectDir ?? appDir, fileOrDir)) ||
+            await (0, fs_extra_1.pathExists)(path.join(appDir, fileOrDir))) {
             isDependenciesInstalled = true;
             break;
         }
