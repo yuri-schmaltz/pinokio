@@ -527,33 +527,11 @@ if (!gotTheLock) {
         },
       })
       arg.val = arg.val || ''
-      const promptHtml = `<html><body><form><label for="val">${arg.title}</label>
-<input id="val" value="${arg.val}" autofocus />
-<button id='ok'>OK</button>
-<button id='cancel'>Cancel</button></form>
-<style>body {font-family: sans-serif;} form {padding: 5px; } button {float:right; margin-left: 10px;} label { display: block; margin-bottom: 5px; width: 100%; } input {margin-bottom: 10px; padding: 5px; width: 100%; display:block;}</style>
-<script>
-document.querySelector("#cancel").addEventListener("click", (e) => {
-  debugger
-  e.preventDefault()
-  e.stopPropagation()
-  window.close()
-})
-document.querySelector("form").addEventListener("submit", (e) => {
-  e.preventDefault()
-  e.stopPropagation()
-  debugger
-  window.electronAPI.send('prompt-response', document.querySelector("#val").value)
-  window.close()
-})
-</script></body></html>`
-
-//      promptWindow.loadFile("prompt.html")
+      let promptHtml = fs.readFileSync(path.join(__dirname, 'prompt.html'), 'utf8')
+      promptHtml = promptHtml.replace('${arg.title}', arg.title).replace('${arg.val}', arg.val)
       promptWindow.loadURL('data:text/html,' + encodeURIComponent(promptHtml))
       promptWindow.show()
       promptWindow.on('closed', function() {
-        console.log({ promptResponse })
-        debugger
         eventRet.returnValue = promptResponse
         promptWindow = null
       })
