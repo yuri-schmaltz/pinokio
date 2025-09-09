@@ -9,8 +9,8 @@ module.exports = {
     return `https://pinokiocomputer.github.io/home/item?uri=${gitRemote}&display=profile`
   },
   site: "https://pinokiocomputer.github.io/home",
-  discover_dark: "https://pinokiocomputer.github.io/home/app?theme=dark",
-  discover_light: "https://pinokiocomputer.github.io/home/app",
+  discover_dark: "/discover?theme=dark",
+  discover_light: "/discover?theme=light",
   portal: "https://pinokiocomputer.github.io/home/portal",
   docs: "https://pinokiocomputer.github.io/program.pinokio.computer",
   install: "https://pinokiocomputer.github.io/program.pinokio.computer/#/?id=install",

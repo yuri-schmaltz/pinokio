@@ -5,6 +5,7 @@ const path = require("path")
 const Pinokiod = require("pinokiod")
 const os = require('os')
 const Updater = require('./updater')
+const axios = require('axios')
 const is_mac = process.platform.startsWith("darwin")
 const platform = os.platform()
 var mainWindow;
@@ -579,6 +580,18 @@ document.querySelector("form").addEventListener("submit", (e) => {
           await session.defaultSession.clearStorageData()
           console.log("cleared")
         }
+      }
+    })
+    pinokiod.app.get('/discover', async (req, res) => {
+      try {
+        const theme = req.query.theme || 'dark'
+        const url = `https://pinokio.co/app?theme=${theme}`
+        let html = (await axios.get(url)).data
+        html = html.replace(/<aside[\s\S]*?<\/aside>/, '')
+        html = html.replace(/<div class=\"community\">[\s\S]*?<\/div>/, '')
+        res.set('Content-Type', 'text/html').send(html)
+      } catch (e) {
+        res.status(500).send('Failed to load page')
       }
     })
     PORT = pinokiod.port
