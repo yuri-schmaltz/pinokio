@@ -7,6 +7,7 @@ const os = require('os')
 const Updater = require('./updater')
 const is_mac = process.platform.startsWith("darwin")
 const platform = os.platform()
+const ALLOWED_PERMISSIONS = new Set(['display-capture', 'desktopCapture'])
 var mainWindow;
 var root_url;
 var wins = {}
@@ -1942,15 +1943,9 @@ const createWindow = (port) => {
 
   // Enable screen capture permissions
   mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(true)
-    //console.log(`[PERMISSION DEBUG] MainWindow permission requested: "${permission}"`)
-    //if (permission === 'media' || permission === 'display-capture' || permission === 'desktopCapture') {
-    //  console.log(`[PERMISSION DEBUG] MainWindow granting permission: "${permission}"`)
-    //  callback(true)
-    //} else {
-    //  console.log(`[PERMISSION DEBUG] MainWindow denying permission: "${permission}"`)
-    //  callback(false)
-    //}
+    const allow = ALLOWED_PERMISSIONS.has(permission)
+    console.log('[PERMISSION]', { context: 'mainWindow', url: webContents.getURL(), permission, allow })
+    callback(allow)
   })
 //  enable_cors(mainWindow)
   if("" + port === "80") {
@@ -1994,15 +1989,9 @@ const loadNewWindow = (url, port) => {
 
   // Enable screen capture permissions
   win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(true)
-    //console.log(`[PERMISSION DEBUG] New window permission requested: "${permission}"`)
-    //if (permission === 'media' || permission === 'display-capture' || permission === 'desktopCapture') {
-    //  console.log(`[PERMISSION DEBUG] New window granting permission: "${permission}"`)
-    //  callback(true)
-    //} else {
-    //  console.log(`[PERMISSION DEBUG] New window denying permission: "${permission}"`)
-    //  callback(false)
-    //}
+    const allow = ALLOWED_PERMISSIONS.has(permission)
+    console.log('[PERMISSION]', { context: 'secondaryWindow', url: webContents.getURL(), permission, allow })
+    callback(allow)
   })
 
 //  enable_cors(win)
@@ -2028,12 +2017,9 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-    
-      // Prevent having error
-      event.preventDefault()
-      // and continue
-      callback(true)
-
+    event.preventDefault()
+    console.error('[CERT-ERROR]', { url, error })
+    callback(false)
   })
 
   app.on('second-instance', (event, argv) => {

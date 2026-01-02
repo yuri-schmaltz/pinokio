@@ -14,38 +14,37 @@ const sendPinokio = (action) => {
 
 
 // ONLY WHEN IN CHILD FRAME
-if (window.parent === window.top) {
-  if (window.location !== window.parent.location) {
-    let prevUrl = document.location.href
-    sendPinokio({
-      type: "location",
-      url: prevUrl
-    })
-    setInterval(() => {
-      const currUrl = document.location.href;
-  //    console.log({ currUrl, prevUrl })
-      if (currUrl != prevUrl) {
-        // URL changed
-        prevUrl = currUrl;
-        console.log(`URL changed to : ${currUrl}`);
-        sendPinokio({
-          type: "location",
-          url: currUrl
-        })
-      }
-    }, 100);
-    window.addEventListener("message", (event) => {
-      if (event.data) {
-        if (event.data.action === "back") {
-          history.back()
-        } else if (event.data.action === "forward") {
-          history.forward()
-        } else if (event.data.action === "refresh") {
-          location.reload()
-        }
-      }
-    })
-  }
+if (window.parent !== window.top) {
+  let prevUrl = document.location.href
+  sendPinokio({
+    type: "location",
+    url: prevUrl
+  })
+  setInterval(() => {
+    const currUrl = document.location.href;
+//    console.log({ currUrl, prevUrl })
+    if (currUrl !== prevUrl) {
+      // URL changed
+      prevUrl = currUrl;
+      console.log(`URL changed to : ${currUrl}`);
+      sendPinokio({
+        type: "location",
+        url: currUrl
+      })
+    }
+  }, 100);
+  window.addEventListener("message", (event) => {
+    if (!event.data) {
+      return
+    }
+    if (event.data.action === "back") {
+      history.back()
+    } else if (event.data.action === "forward") {
+      history.forward()
+    } else if (event.data.action === "refresh") {
+      location.reload()
+    }
+  })
 }
 
 
