@@ -1,11 +1,18 @@
 // put this preload for main-window to give it prompt()
-const { ipcRenderer, } = require('electron')
-window.prompt = function(title, val){
-  return ipcRenderer.sendSync('prompt', {title, val})
+const { ipcRenderer, contextBridge } = require('electron')
+const promptImpl = (title, val) => ipcRenderer.sendSync('prompt', { title, val })
+try {
+  if (contextBridge && typeof contextBridge.exposeInMainWorld === 'function') {
+    contextBridge.exposeInMainWorld('prompt', promptImpl)
+  } else {
+    window.prompt = promptImpl
+  }
+} catch (err) {
+  window.prompt = promptImpl
 }
 const sendPinokio = (action) => {
   console.log("window.parent == window.top?", window.parent === window.top, action, location.href)
-  if (window.parent === window.top) {
+  if (window.parent !== window.top) {
     window.parent.postMessage({
       action
     }, "*")
@@ -58,7 +65,7 @@ if (window.parent !== window.top) {
 //    }, "*")
 //  }
 //})
-window.electronAPI = {
+const electronAPI = {
   send: (type, msg) => {
     ipcRenderer.send(type, msg)
   },
@@ -67,6 +74,15 @@ window.electronAPI = {
   captureScreenshot: (screenshotRequest) => {
     return ipcRenderer.invoke('pinokio:capture-screenshot-debug', { screenshotRequest })
   },
+}
+try {
+  if (contextBridge && typeof contextBridge.exposeInMainWorld === 'function') {
+    contextBridge.exposeInMainWorld('electronAPI', electronAPI)
+  } else {
+    window.electronAPI = electronAPI
+  }
+} catch (err) {
+  window.electronAPI = electronAPI
 }
 
 ;(function initInspector() {

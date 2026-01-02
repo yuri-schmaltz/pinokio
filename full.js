@@ -7,7 +7,8 @@ const os = require('os')
 const Updater = require('./updater')
 const is_mac = process.platform.startsWith("darwin")
 const platform = os.platform()
-const ALLOWED_PERMISSIONS = new Set(['display-capture', 'desktopCapture'])
+const { HARDEN_RENDERER, ALLOWED_PERMISSIONS, buildWebPreferences } = require('./webprefs')
+const { installPermissionHandler, installCertificateErrorHandler } = require('./permissions')
 var mainWindow;
 var root_url;
 var wins = {}
@@ -1548,23 +1549,11 @@ const attach = (event, webContents) => {
     })
   }
 
-  // Enable screen capture permissions for all webContents
-  webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(true)
-    //console.log(`[PERMISSION DEBUG] Permission requested: "${permission}" from webContents`)
-    //if (permission === 'media' || permission === 'display-capture' || permission === 'desktopCapture') {
-    //  console.log(`[PERMISSION DEBUG] Granting permission: "${permission}"`)
-    //  callback(true)
-    //} else {
-    //  console.log(`[PERMISSION DEBUG] Denying permission: "${permission}"`)
-    //  callback(false)
-    //}
-  })
+  // Enable screen capture permissions for all webContents using allowlist
+  installPermissionHandler(webContents.session, ALLOWED_PERMISSIONS, 'webContents-session')
 
   webContents.session.setPermissionCheckHandler((webContents, permission) => {
-    return true
-    //console.log(`[PERMISSION DEBUG] Permission check for: "${permission}"`)
-    //return permission === 'media' || permission === 'display-capture' || permission === 'desktopCapture'
+    return ALLOWED_PERMISSIONS.has(permission)
   })
 
   webContents.session.setDisplayMediaRequestHandler((request, callback) => {
@@ -1776,14 +1765,7 @@ const attach = (event, webContents) => {
           parent: null,
           titleBarStyle : "hidden",
           titleBarOverlay : titleBarOverlay(colors),
-          webPreferences: {
-            session: session.fromPartition('temp-window-' + Date.now()),
-            webSecurity: false,
-            nativeWindowOpen: true,
-            contextIsolation: false,
-            nodeIntegrationInSubFrames: true,
-            preload: path.join(__dirname, 'preload.js')
-          },
+          webPreferences: buildWebPreferences('window-open-localhost'),
         }
       }
     } else {
@@ -1802,14 +1784,7 @@ const attach = (event, webContents) => {
               parent: null,
               titleBarStyle : "hidden",
               titleBarOverlay : titleBarOverlay(colors),
-              webPreferences: {
-                session: session.fromPartition('temp-window-' + Date.now()),
-                webSecurity: false,
-                nativeWindowOpen: true,
-                contextIsolation: false,
-                nodeIntegrationInSubFrames: true,
-                preload: path.join(__dirname, 'preload.js')
-              },
+              webPreferences: buildWebPreferences('window-open-app'),
 
             }
           }
@@ -1912,16 +1887,7 @@ const createWindow = (port) => {
     width: mainWindowState.width,
     height: mainWindowState.height,
     minWidth: 190,
-    webPreferences: {
-      session: session.fromPartition('temp-window-' + Date.now()),
-      webSecurity: false,
-      nativeWindowOpen: true,
-      contextIsolation: false,
-      nodeIntegrationInSubFrames: true,
-      enableRemoteModule: false,
-      experimentalFeatures: true,
-      preload: path.join(__dirname, 'preload.js')
-    },
+    webPreferences: buildWebPreferences('mainWindow'),
   })
 
   mainWindow.on('closed', () => {
@@ -1942,11 +1908,7 @@ const createWindow = (port) => {
   })
 
   // Enable screen capture permissions
-  mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const allow = ALLOWED_PERMISSIONS.has(permission)
-    console.log('[PERMISSION]', { context: 'mainWindow', url: webContents.getURL(), permission, allow })
-    callback(allow)
-  })
+  installPermissionHandler(mainWindow.webContents.session, ALLOWED_PERMISSIONS, 'mainWindow')
 //  enable_cors(mainWindow)
   if("" + port === "80") {
     root_url = `http://localhost`
@@ -1975,24 +1937,11 @@ const loadNewWindow = (url, port) => {
     width: winState.width,
     height: winState.height,
     minWidth: 190,
-    webPreferences: {
-      session: session.fromPartition('temp-window-' + Date.now()),
-      webSecurity: false,
-      nativeWindowOpen: true,
-      contextIsolation: false,
-      nodeIntegrationInSubFrames: true,
-      enableRemoteModule: false,
-      experimentalFeatures: true,
-      preload: path.join(__dirname, 'preload.js')
-    },
+    webPreferences: buildWebPreferences('secondaryWindow'),
   })
 
   // Enable screen capture permissions
-  win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    const allow = ALLOWED_PERMISSIONS.has(permission)
-    console.log('[PERMISSION]', { context: 'secondaryWindow', url: webContents.getURL(), permission, allow })
-    callback(allow)
-  })
+  installPermissionHandler(win.webContents.session, ALLOWED_PERMISSIONS, 'secondaryWindow')
 
 //  enable_cors(win)
   win.focus()
@@ -2016,11 +1965,7 @@ const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
 } else {
-  app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
-    event.preventDefault()
-    console.error('[CERT-ERROR]', { url, error })
-    callback(false)
-  })
+  installCertificateErrorHandler(app)
 
   app.on('second-instance', (event, argv) => {
 
@@ -2075,14 +2020,7 @@ if (!gotTheLock) {
 //        movable: false,
 //        alwaysOnTop: true,
         frame: false,
-        webPreferences: {
-          session: session.fromPartition('temp-window-' + Date.now()),
-          webSecurity: false,
-          nativeWindowOpen: true,
-          contextIsolation: false,
-          nodeIntegrationInSubFrames: true,
-          preload: path.join(__dirname, 'preload.js')
-        },
+        webPreferences: buildWebPreferences('promptWindow'),
       })
       arg.val = arg.val || ''
       const promptHtml = `<html><body><form><label for="val">${arg.title}</label>

@@ -19,7 +19,9 @@
     "zip": "node script/zip",
     "monkeypatch": "cp temp/yarn.js node_modules/app-builder-lib/out/util/yarn.js && cp temp/rebuild.js node_modules/@electron/rebuild/lib/src/rebuild.js",
     "postinstall2": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps",
-    "fix": "brew install fpm"
+    "fix": "brew install fpm",
+    "test": "npm run test:smoke",
+    "test:smoke": "mocha \"test/smoke/**/*.test.js\""
   },
   "build": {
     "appId": "computer.pinokio",
@@ -150,6 +152,9 @@
     "@electron/rebuild": "3.2.10",
     "electron": "39.2.3",
     "electron-builder": "26.2.0",
-    "electron-builder-notarize": "^1.5.2"
+    "electron-builder-notarize": "^1.5.2",
+    "mocha": "^10.7.3",
+    "proxyquire": "^2.1.3",
+    "sinon": "^17.0.1"
   }
 }
