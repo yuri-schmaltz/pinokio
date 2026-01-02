@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-prompt';">
+<meta http-equiv="Content-Security-Policy" id="csp-meta" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-prompt';">
 <style>
 :root {
   --bg: #f5f7fb;
@@ -126,6 +126,13 @@ button.primary {
     const params = new URLSearchParams(window.location.search)
     const value = params.get(key)
     return value && value.trim().length ? value : fallback
+  }
+
+  const nonce = crypto.randomUUID()
+  document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
+  const csp = document.getElementById('csp-meta')
+  if (csp) {
+    csp.setAttribute('content', csp.content.replace(/pinokio-prompt/g, nonce))
   }
 
   const setTheme = () => {

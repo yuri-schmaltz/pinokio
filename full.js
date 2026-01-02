@@ -9,6 +9,7 @@ const is_mac = process.platform.startsWith("darwin")
 const platform = os.platform()
 const { HARDEN_RENDERER, ALLOWED_PERMISSIONS, buildWebPreferences } = require('./webprefs')
 const { installPermissionHandler, installCertificateErrorHandler } = require('./permissions')
+const { checkPort } = require('./script/heartbeat')
 var mainWindow;
 var root_url;
 var wins = {}
@@ -2071,10 +2072,12 @@ document.querySelector("form").addEventListener("submit", (e) => {
     try {
       try {
         const portInUse = await pinokiod.running(pinokiod.port)
-        if (portInUse) {
+        const heartbeat = await checkPort(pinokiod.port)
+        if (portInUse || heartbeat) {
           showStartupError({
             message: 'Pinokio is already running',
-            detail: `Pinokio detected another instance listening on port ${pinokiod.port}. Please close the other instance before launching a new one.`
+            detail: `Pinokio detected another instance listening on port ${pinokiod.port}. Tente fechar a instância ou use outra porta.`,
+            action: 'choose-port'
           })
           return
         }

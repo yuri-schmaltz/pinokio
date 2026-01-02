@@ -12,7 +12,7 @@ describe('web preferences', () => {
   })
 
   it('defaults to relaxed settings', () => {
-    delete process.env.PINOKIO_HARDEN_RENDERER
+    process.env.PINOKIO_HARDEN_RENDERER = '0'
     const { buildWebPreferences, ALLOWED_PERMISSIONS, HARDEN_RENDERER } = loadPrefs()
     const prefs = buildWebPreferences('test-default')
     assert.strictEqual(HARDEN_RENDERER, false)

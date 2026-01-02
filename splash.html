@@ -203,6 +203,13 @@ body[data-state="loading"] .detail {
     <p class="hint" id="hint"></p>
   </div>
 <script nonce="pinokio-splash">
+  const nonce = crypto.randomUUID()
+  document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
+  const csp = document.getElementById('csp-meta')
+  if (csp) {
+    csp.setAttribute('content', csp.content.replace(/pinokio-splash/g, nonce))
+  }
+
   const setTheme = () => {
     const params = new URLSearchParams(window.location.search)
     const themeParam = params.get('theme')
@@ -267,6 +274,17 @@ body[data-state="loading"] .detail {
   }
 
   retryBtn?.addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search)
+    const action = params.get('action')
+    if (action === 'choose-port') {
+      const current = params.get('port') || ''
+      const next = prompt('Informe uma porta livre', current || '42001')
+      if (next) {
+        params.set('port', next)
+        window.location.search = params.toString()
+        return
+      }
+    }
     window.location.reload()
   })
 
