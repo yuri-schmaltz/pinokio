@@ -1,60 +1,109 @@
-<html>
+<!doctype html>
+<html lang="pt-BR">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
+:root {
+  --bg: radial-gradient(120% 120% at 30% 20%, #e0f4ff 0%, #f8fbff 35%, #f6f7fb 100%);
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #5b6478;
+  --code-bg: #0f172a;
+  --code-border: #1e293b;
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --error: #dc2626;
+  --border: #e5e7eb;
+  --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+}
+:root[data-theme="dark"] {
+  --bg: radial-gradient(140% 140% at 20% 20%, #0b1220 0%, #0b1220 45%, #0f172a 100%);
+  --card: #0f172a;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --code-bg: #0b1220;
+  --code-border: #1f2937;
+  --accent: #60a5fa;
+  --accent-strong: #3b82f6;
+  --error: #f87171;
+  --border: #1e293b;
+  --shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
+}
+* { box-sizing: border-box; }
 html, body {
   width: 100%;
   height: 100%;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #ffffff;
-  color: #111827;
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  padding: 16px;
 }
-.card {
-  width: min(360px, 90vw);
-  padding: 32px;
-  text-align: center;
+.shell {
+  width: min(460px, 94vw);
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 28px 26px;
+  display: grid;
+  gap: 16px;
+  border: 1px solid var(--border);
+}
+.header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  max-height: calc(100vh - 40px);
-  overflow: hidden;
+  gap: 12px;
 }
 .logo {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: rgba(37, 99, 235, 0.12);
+  padding: 6px;
 }
 .title {
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 600;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 .subtitle {
-  margin: 0;
-  opacity: 0.85;
-  line-height: 1.4;
+  margin: 2px 0 0;
   font-size: 13px;
+  color: var(--muted);
 }
-.hint {
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
   font-size: 12px;
-  opacity: 0.7;
-  margin: 16px 0 0;
-  word-break: break-word;
+  font-weight: 600;
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-strong);
+}
+.pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .loader {
-  width: 60px;
-  height: 2px;
-  margin: 24px auto;
-  background: rgba(17, 24, 39, 0.08);
-  overflow: hidden;
   position: relative;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.6);
+  overflow: hidden;
 }
 .loader::after {
   content: "";
@@ -63,86 +112,173 @@ body {
   left: -30%;
   width: 30%;
   height: 100%;
-  background: #111827;
-  animation: slide 1.2s ease-in-out infinite;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.25) 0%, var(--accent) 60%, rgba(37, 99, 235, 0.25) 100%);
+  animation: sweep 1.2s ease-in-out infinite;
+}
+@keyframes sweep {
+  0% { left: -30%; }
+  50% { left: 70%; }
+  100% { left: 110%; }
 }
 .detail {
+  background: var(--code-bg);
+  color: #e2e8f0;
+  border-radius: 14px;
   padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(17, 24, 39, 0.08);
   font-size: 12px;
-  text-align: left;
+  line-height: 1.5;
   white-space: pre-wrap;
-  margin-top: 16px;
-  max-height: 160px;
+  max-height: 180px;
   overflow-y: auto;
-  background: rgba(249, 250, 251, 0.8);
-  width: 100%;
+  border: 1px solid var(--code-border);
 }
-body.error .subtitle {
-  color: #b91c1c;
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
 }
-body.error .loader {
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn {
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
+}
+.btn.primary {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+}
+.hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  word-break: break-word;
+}
+body[data-state="error"] .pill {
+  background: #fee2e2;
+  color: var(--error);
+}
+body[data-state="error"] .loader {
   display: none;
 }
-@keyframes slide {
-  0% {
-    left: -30%;
-  }
-  50% {
-    left: 100%;
-  }
-  100% {
-    left: 100%;
-  }
+body[data-state="loading"] .detail {
+  display: none;
 }
 </style>
 </head>
-<body>
-<div class="card">
-  <img class="logo" id="logo" src="assets/icon.png" alt="Pinokio" onerror="this.onerror=null;this.src='assets/icon_small.png'">
-  <div class="text">
-    <p class="title" id="title">Starting Pinokio…</p>
-    <p class="subtitle" id="subtitle">This should only take a moment.</p>
+<body data-state="loading">
+  <div class="shell">
+    <div class="header">
+      <img class="logo" id="logo" src="assets/icon.png" alt="Pinokio" onerror="this.onerror=null;this.src='assets/icon_small.png'">
+      <div>
+        <p class="title" id="title">Iniciando o Pinokio…</p>
+        <p class="subtitle" id="subtitle">Configurando serviços locais e preparando a UI.</p>
+      </div>
+    </div>
+    <div class="pill" id="status-pill"><span class="dot"></span><span id="status-text">Preparando</span></div>
+    <div class="loader" id="loader"></div>
+    <pre class="detail" id="detail" hidden></pre>
+    <div class="actions" id="actions">
+      <button class="btn primary" id="retry" hidden>Reiniciar</button>
+      <button class="btn" id="copy-log" hidden>Copiar caminho do log</button>
+    </div>
+    <p class="hint" id="hint"></p>
   </div>
-  <div class="loader" id="loader"></div>
-  <pre class="detail" id="detail" hidden></pre>
-  <p class="hint" id="hint" hidden></p>
-</div>
 <script>
+  const setTheme = () => {
+    const params = new URLSearchParams(window.location.search)
+    const themeParam = params.get('theme')
+    let theme = null
+    if (themeParam === 'dark' || themeParam === 'light') {
+      theme = themeParam
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      theme = 'dark'
+    }
+    if (theme) {
+      document.documentElement.dataset.theme = theme
+    }
+  }
+  setTheme()
+
   const params = new URLSearchParams(window.location.search)
+  const accentParam = params.get('accent')
+  const isValidHex = (value) => /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(value || '')
+  if (accentParam && isValidHex(accentParam)) {
+    document.documentElement.style.setProperty('--accent', accentParam)
+    document.documentElement.style.setProperty('--accent-strong', accentParam)
+  }
   const state = params.get('state') || 'loading'
-  const message = params.get('message') || 'Starting Pinokio…'
+  const message = params.get('message') || 'Iniciando o Pinokio…'
   const detail = params.get('detail')
-  const logPath = params.get('log')
+  const logPath = params.get('log') || 'Logs: ~/.pinokio/logs/stdout.txt'
   const icon = params.get('icon')
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = value
+  }
 
   if (icon) {
     const logo = document.getElementById('logo')
-    if (logo) {
-      logo.src = icon
-    }
+    if (logo) logo.src = icon
   }
 
-  document.getElementById('title').textContent = message
+  document.body.dataset.state = state
+  setText('title', message)
+
+  const hintEl = document.getElementById('hint')
+  const statusText = document.getElementById('status-text')
+  const detailEl = document.getElementById('detail')
+  const retryBtn = document.getElementById('retry')
+  const copyBtn = document.getElementById('copy-log')
+
   if (state === 'error') {
-    document.body.classList.add('error')
-    const friendly = detail && detail.trim().length > 0
-      ? detail
-      : 'Please review the Pinokio logs for more information.'
-    document.getElementById('loader').hidden = true
-    const detailEl = document.getElementById('detail')
-    detailEl.textContent = friendly
+    setText('subtitle', 'Algo impediu o Pinokio de iniciar.')
+    setText('status-text', 'Falhou')
+    document.getElementById('status-pill').style.background = '#fee2e2'
+    document.getElementById('status-pill').style.color = '#dc2626'
+    detailEl.textContent = detail && detail.trim().length ? detail : 'Confira os logs para mais detalhes.'
     detailEl.hidden = false
-    const hintEl = document.getElementById('hint')
+    retryBtn.hidden = false
+    copyBtn.hidden = false
     hintEl.textContent = logPath
-      ? `Logs: ${logPath}`
-      : 'Logs: ~/.pinokio/logs/stdout.txt'
-    hintEl.hidden = false
-    document.getElementById('subtitle').textContent = 'Something stopped Pinokio from starting.'
   } else {
-    document.getElementById('subtitle').textContent = 'This should only take a moment.'
+    setText('subtitle', 'Isso deve levar apenas alguns segundos.')
+    setText('status-text', 'Preparando')
+    hintEl.textContent = 'Você pode manter esta janela aberta enquanto finalizamos a inicialização.'
   }
+
+  retryBtn?.addEventListener('click', () => {
+    window.location.reload()
+  })
+
+  copyBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(logPath)
+      copyBtn.textContent = 'Caminho copiado'
+      setTimeout(() => { copyBtn.textContent = 'Copiar caminho do log' }, 1800)
+    } catch (err) {
+      copyBtn.textContent = logPath
+    }
+  })
 </script>
 </body>
 </html>
