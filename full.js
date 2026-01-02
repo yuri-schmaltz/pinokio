@@ -2,7 +2,7 @@ const {app, screen, shell, BrowserWindow, BrowserView, ipcMain, dialog, clipboar
 const windowStateKeeper = require('electron-window-state');
 const fs = require('fs')
 const path = require("path")
-const Pinokiod = require("pinokiod")
+const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('./test/support/pinokio-mock') : require("pinokiod")
 const os = require('os')
 const Updater = require('./updater')
 const is_mac = process.platform.startsWith("darwin")
@@ -61,7 +61,7 @@ const filter = function (item) {
 };
 
 const updater = new Updater()
-const pinokiod = new Pinokiod(config)
+const pinokiod = new PinokioImpl(config)
 const ENABLE_BROWSER_CONSOLE_LOG = process.env.PINOKIO_BROWSER_LOG === '1'
 const browserConsoleState = new WeakMap()
 const attachedConsoleListeners = new WeakSet()
@@ -2062,6 +2062,7 @@ document.querySelector("form").addEventListener("submit", (e) => {
     })
 
 
+    const startTs = Date.now()
     updateSplashWindow({
       state: 'loading',
       message: 'Starting Pinokio…',
@@ -2119,6 +2120,7 @@ document.querySelector("form").addEventListener("submit", (e) => {
       showStartupError({ error })
       return
     }
+    console.log('[STARTUP]', { elapsedMs: Date.now() - startTs, port: pinokiod.port, hardened: HARDEN_RENDERER })
     closeSplashWindow()
     PORT = pinokiod.port
     app.on('web-contents-created', attach)

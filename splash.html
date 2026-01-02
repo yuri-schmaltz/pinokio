@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" id="csp-meta" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-splash';">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap');
 :root {
   --bg: radial-gradient(120% 120% at 30% 20%, #e0f4ff 0%, #f8fbff 35%, #f6f7fb 100%);
   --card: #ffffff;
@@ -36,7 +36,7 @@ html, body {
   width: 100%;
   height: 100%;
   margin: 0;
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -202,7 +202,7 @@ body[data-state="loading"] .detail {
     </div>
     <p class="hint" id="hint"></p>
   </div>
-<script>
+<script nonce="pinokio-splash">
   const setTheme = () => {
     const params = new URLSearchParams(window.location.search)
     const themeParam = params.get('theme')

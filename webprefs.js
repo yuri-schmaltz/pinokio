@@ -14,7 +14,7 @@ if (!session || typeof session.fromPartition !== 'function') {
 }
 const path = require('path')
 
-const HARDEN_RENDERER = process.env.PINOKIO_HARDEN_RENDERER === '1'
+const HARDEN_RENDERER = process.env.PINOKIO_HARDEN_RENDERER === '0' ? false : true
 const ALLOWED_PERMISSIONS = new Set(['display-capture', 'desktopCapture'])
 
 const buildWebPreferences = (label) => {

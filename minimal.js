@@ -2,10 +2,10 @@ const { app, Tray, Menu, shell, nativeImage, BrowserWindow, session, Notificatio
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const Pinokiod = require("pinokiod")
+const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('./test/support/pinokio-mock') : require("pinokiod")
 const config = require('./config')
 const Updater = require('./updater')
-const pinokiod = new Pinokiod(config)
+const pinokiod = new PinokioImpl(config)
 const updater = new Updater()
 let tray
 let hiddenWindow
@@ -199,6 +199,22 @@ app.whenReady().then(async () => {
   tray = new Tray(icon)
   const contextMenu = Menu.buildFromTemplate([
     { label: 'Open in Browser', click: () => shell.openExternal(rootUrl) },
+    { label: 'Open Logs', click: () => shell.showItemInFolder(getLogFileHint()) },
+    { label: 'Clear Cache', click: async () => {
+      try {
+        await session.defaultSession.clearStorageData()
+        const windows = BrowserWindow.getAllWindows()
+        for (const window of windows) {
+          if (window.webContents && window.webContents.session) {
+            await window.webContents.session.clearStorageData()
+          }
+        }
+        console.log('[CACHE] Cleared all sessions')
+      } catch (err) {
+        console.error('[CACHE] Failed to clear cache', err)
+      }
+    }},
+    { type: 'separator' },
     { label: 'Restart', click: () => { app.relaunch(); app.exit(); } },
     { label: 'Quit', click: () => app.quit() }
   ]);
