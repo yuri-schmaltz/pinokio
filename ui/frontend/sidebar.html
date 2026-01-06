@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/ai-sidebar.css">
+    <link rel="stylesheet" href="../assets/skeleton.css">
+</head>
+
+<body style="margin: 0; background: #0f172a;">
+    <aside class="ai-sidebar">
+        <div class="ai-sidebar-header">
+            <div class="ai-logo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+            </div>
+            <span style="font-weight: 700; font-size: 18px; letter-spacing: -0.5px;">Pinokio <span
+                    style="color: #3b82f6;">UI</span></span>
+        </div>
+
+        <nav class="ai-nav-group">
+            <div class="ai-nav-label">Core</div>
+            <a href="#" class="ai-nav-item active">
+                <span>🏠</span> Discovery
+            </a>
+            <a href="#" class="ai-nav-item">
+                <span>📚</span> Library
+            </a>
+            <a href="#" class="ai-nav-item">
+                <span>⚡</span> Environments
+            </a>
+        </nav>
+
+        <nav class="ai-nav-group">
+            <div class="ai-nav-label">Status</div>
+            <div id="status-container">
+                <!-- Will be populated by tauriBridge -->
+                <div class="skeleton-text short" style="margin: 10px;"></div>
+            </div>
+        </nav>
+
+        <div class="ai-status-indicator">
+            <div class="ai-status-row">
+                <span>CPU</span>
+                <span class="ai-status-val" id="cpu-val">--%</span>
+            </div>
+            <div class="ai-status-row">
+                <span>MEM</span>
+                <span class="ai-status-val" id="mem-val">--GB</span>
+            </div>
+            <div class="status-pill running" style="font-size: 10px; padding: 2px 8px;">Kernel Online</div>
+        </div>
+    </aside>
+
+    <script src="../lib/tauri-bridge.js"></script>
+    <script>
+        async function updateStats() {
+            const bridge = window.tauriBridge;
+            if (bridge && bridge.isTauri()) {
+                try {
+                    const stats = await bridge.getSystemResources();
+                    document.getElementById('cpu-val').textContent = stats.cpu_total.toFixed(1) + '%';
+                    document.getElementById('mem-val').textContent = stats.mem_used_gb.toFixed(1) + 'GB';
+                    if (window.electronAPI) {
+                        window.electronAPI.send('log-stat', { cpu: stats.cpu_total });
+                    }
+                } catch (e) {
+                    console.error("Update failed", e);
+                }
+            }
+        }
+        setInterval(updateStats, 2000);
+        updateStats();
+    </script>
+</body>
+
+</html>
