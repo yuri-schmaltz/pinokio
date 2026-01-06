@@ -1,111 +1,127 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" id="csp-meta" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-prompt';">
+<meta http-equiv="Content-Security-Policy" id="csp-meta"
+  content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-prompt';">
+<link rel="stylesheet" href="assets/skeleton.css">
 <style>
-:root {
-  --bg: #f5f7fb;
-  --panel: #ffffff;
-  --text: #0f172a;
-  --muted: #475569;
-  --accent: #2563eb;
-  --border: #e2e8f0;
-  --shadow: 0 12px 40px rgba(15, 23, 42, 0.16);
-}
-:root[data-theme="dark"] {
-  --bg: #0b1220;
-  --panel: #0f172a;
-  --text: #f8fafc;
-  --muted: #cbd5e1;
-  --accent: #3b82f6;
-  --border: #1f2937;
-  --shadow: 0 12px 48px rgba(0,0,0,0.35);
-}
-* { box-sizing: border-box; }
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  font-family: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.card {
-  width: min(420px, 92vw);
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px 18px;
-  box-shadow: var(--shadow);
-  display: grid;
-  gap: 14px;
-}
-.title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-}
-.description {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-}
-.field {
-  display: grid;
-  gap: 6px;
-}
-label {
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 0.01em;
-}
-input[type="text"] {
-  width: 100%;
-  padding: 11px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #0b1220;
-  color: var(--text);
-  font-size: 14px;
-}
-input[type="text"]:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-button {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #111827;
-  color: var(--text);
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 32px rgba(0,0,0,0.25);
-}
-button.primary {
-  background: var(--accent);
-  border-color: #2563eb;
-  color: #fff;
-}
+  :root {
+    --bg: #f5f7fb;
+    --panel: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #2563eb;
+    --border: #e2e8f0;
+    --shadow: 0 12px 40px rgba(15, 23, 42, 0.16);
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0b1220;
+    --panel: #0f172a;
+    --text: #f8fafc;
+    --muted: #cbd5e1;
+    --accent: #3b82f6;
+    --border: #1f2937;
+    --shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    width: min(420px, 92vw);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 18px;
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 14px;
+  }
+
+  .title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #0b1220;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  input[type="text"]:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  button {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #111827;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25);
+  }
+
+  button.primary {
+    background: var(--accent);
+    border-color: #2563eb;
+    color: #fff;
+  }
 </style>
 </head>
+
 <body>
   <div class="card">
     <div>
@@ -121,87 +137,88 @@ button.primary {
       <button type="submit" class="primary" id="ok">Confirmar</button>
     </div>
   </div>
-<script nonce="pinokio-prompt">
-  const getParam = (key, fallback) => {
-    const params = new URLSearchParams(window.location.search)
-    const value = params.get(key)
-    return value && value.trim().length ? value : fallback
-  }
-
-  const nonce = crypto.randomUUID()
-  document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
-  const csp = document.getElementById('csp-meta')
-  if (csp) {
-    csp.setAttribute('content', csp.content.replace(/pinokio-prompt/g, nonce))
-  }
-
-  const setTheme = () => {
-    const params = new URLSearchParams(window.location.search)
-    const themeParam = params.get('theme')
-    const accentParam = params.get('accent')
-    const isValidHex = (value) => /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(value || '')
-    if (accentParam && isValidHex(accentParam)) {
-      document.documentElement.style.setProperty('--accent', accentParam)
+  <script nonce="pinokio-prompt">
+    const getParam = (key, fallback) => {
+      const params = new URLSearchParams(window.location.search)
+      const value = params.get(key)
+      return value && value.trim().length ? value : fallback
     }
-    let theme = null
-    if (themeParam === 'dark' || themeParam === 'light') {
-      theme = themeParam
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      theme = 'dark'
-    }
-    if (theme) {
-      document.documentElement.dataset.theme = theme
-    }
-  }
-  setTheme()
 
-  const sendResponse = (value) => {
-    try {
-      if (window.electronAPI && typeof window.electronAPI.send === 'function') {
-        window.electronAPI.send('prompt-response', value)
-        return
+    const nonce = crypto.randomUUID()
+    document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
+    const csp = document.getElementById('csp-meta')
+    if (csp) {
+      csp.setAttribute('content', csp.content.replace(/pinokio-prompt/g, nonce))
+    }
+
+    const setTheme = () => {
+      const params = new URLSearchParams(window.location.search)
+      const themeParam = params.get('theme')
+      const accentParam = params.get('accent')
+      const isValidHex = (value) => /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(value || '')
+      if (accentParam && isValidHex(accentParam)) {
+        document.documentElement.style.setProperty('--accent', accentParam)
       }
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ promptResponse: value }, '*')
+      let theme = null
+      if (themeParam === 'dark' || themeParam === 'light') {
+        theme = themeParam
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        theme = 'dark'
       }
-    } catch (err) {
-      // ignore
+      if (theme) {
+        document.documentElement.dataset.theme = theme
+      }
     }
-  }
+    setTheme()
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const title = getParam('title', 'Confirme a ação')
-    const initial = getParam('val', '')
-    const description = getParam('description', 'Digite o valor solicitado e confirme.')
+    const sendResponse = (value) => {
+      try {
+        if (window.electronAPI && typeof window.electronAPI.send === 'function') {
+          window.electronAPI.send('prompt-response', value)
+          return
+        }
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ promptResponse: value }, '*')
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
 
-    document.title = title
-    document.getElementById('title').textContent = title
-    document.getElementById('description').textContent = description
-    document.getElementById('label').textContent = title
-    const input = document.getElementById('val')
-    input.value = initial
-    input.focus()
+    window.addEventListener('DOMContentLoaded', () => {
+      const title = getParam('title', 'Confirme a ação')
+      const initial = getParam('val', '')
+      const description = getParam('description', 'Digite o valor solicitado e confirme.')
 
-    document.getElementById('cancel').addEventListener('click', (e) => {
-      e.preventDefault()
-      sendResponse(null)
-      window.close()
-    })
+      document.title = title
+      document.getElementById('title').textContent = title
+      document.getElementById('description').textContent = description
+      document.getElementById('label').textContent = title
+      const input = document.getElementById('val')
+      input.value = initial
+      input.focus()
 
-    document.getElementById('ok').addEventListener('click', (e) => {
-      e.preventDefault()
-      sendResponse(input.value)
-      window.close()
-    })
+      document.getElementById('cancel').addEventListener('click', (e) => {
+        e.preventDefault()
+        sendResponse(null)
+        window.close()
+      })
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      document.getElementById('ok').addEventListener('click', (e) => {
         e.preventDefault()
         sendResponse(input.value)
         window.close()
-      }
+      })
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          sendResponse(input.value)
+          window.close()
+        }
+      })
     })
-  })
-</script>
+  </script>
 </body>
+
 </html>

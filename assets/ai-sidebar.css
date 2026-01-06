@@ -1,0 +1,96 @@
+/* AI-First Sidebar Design System */
+:root {
+    --sidebar-blur: blur(20px);
+    --sidebar-bg: rgba(15, 23, 42, 0.7);
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --item-hover: rgba(255, 255, 255, 0.05);
+    --accent-glow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+.ai-sidebar {
+    width: 260px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    backdrop-filter: var(--sidebar-blur);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+.ai-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.ai-logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--accent-glow);
+}
+
+.ai-nav-group {
+    margin-bottom: 24px;
+}
+
+.ai-nav-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    padding-left: 12px;
+}
+
+.ai-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.ai-nav-item:hover {
+    background: var(--item-hover);
+    color: #fff;
+    transform: translateX(4px);
+}
+
+.ai-nav-item.active {
+    background: rgba(37, 99, 235, 0.15);
+    color: #60a5fa;
+    border-left: 3px solid #3b82f6;
+}
+
+.ai-status-indicator {
+    margin-top: auto;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.ai-status-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.ai-status-val {
+    color: #60a5fa;
+    font-weight: 600;
+}

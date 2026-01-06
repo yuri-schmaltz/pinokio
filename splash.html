@@ -1,200 +1,259 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" id="csp-meta" content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-splash';">
-<style>
-:root {
-  --bg: radial-gradient(120% 120% at 30% 20%, #e0f4ff 0%, #f8fbff 35%, #f6f7fb 100%);
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #5b6478;
-  --code-bg: #0f172a;
-  --code-border: #1e293b;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --error: #dc2626;
-  --border: #e5e7eb;
-  --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
-}
-:root[data-theme="dark"] {
-  --bg: radial-gradient(140% 140% at 20% 20%, #0b1220 0%, #0b1220 45%, #0f172a 100%);
-  --card: #0f172a;
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --code-bg: #0b1220;
-  --code-border: #1f2937;
-  --accent: #60a5fa;
-  --accent-strong: #3b82f6;
-  --error: #f87171;
-  --border: #1e293b;
-  --shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
-}
-* { box-sizing: border-box; }
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  font-family: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-.shell {
-  width: min(460px, 94vw);
-  background: var(--card);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  padding: 28px 26px;
-  display: grid;
-  gap: 16px;
-  border: 1px solid var(--border);
-}
-.header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.logo {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  object-fit: contain;
-  background: rgba(37, 99, 235, 0.12);
-  padding: 6px;
-}
-.title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--muted);
-}
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: rgba(37, 99, 235, 0.12);
-  color: var(--accent-strong);
-}
-.pill .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.loader {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(226, 232, 240, 0.6);
-  overflow: hidden;
-}
-.loader::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -30%;
-  width: 30%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.25) 0%, var(--accent) 60%, rgba(37, 99, 235, 0.25) 100%);
-  animation: sweep 1.2s ease-in-out infinite;
-}
-@keyframes sweep {
-  0% { left: -30%; }
-  50% { left: 70%; }
-  100% { left: 110%; }
-}
-.detail {
-  background: var(--code-bg);
-  color: #e2e8f0;
-  border-radius: 14px;
-  padding: 14px 16px;
-  font-size: 12px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  max-height: 180px;
-  overflow-y: auto;
-  border: 1px solid var(--code-border);
-}
-.meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  color: var(--muted);
-  flex-wrap: wrap;
-}
-.actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.btn {
-  border: 1px solid var(--border);
-  background: #f8fafc;
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 26px rgba(0,0,0,0.06);
-}
-.btn.primary {
-  background: #2563eb;
-  color: #ffffff;
-  border-color: #1d4ed8;
-}
-.hint {
-  margin: 0;
-  font-size: 12px;
-  color: var(--muted);
-  word-break: break-word;
-}
-body[data-state="error"] .pill {
-  background: #fee2e2;
-  color: var(--error);
-}
-body[data-state="error"] .loader {
-  display: none;
-}
-body[data-state="loading"] .detail {
-  display: none;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" id="csp-meta"
+    content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'nonce-pinokio-splash';">
+  <link rel="stylesheet" href="assets/skeleton.css">
+  <style>
+    :root {
+      --bg: radial-gradient(120% 120% at 30% 20%, #e0f4ff 0%, #f8fbff 35%, #f6f7fb 100%);
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #5b6478;
+      --code-bg: #0f172a;
+      --code-border: #1e293b;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --error: #dc2626;
+      --border: #e5e7eb;
+      --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+    }
+
+    :root[data-theme="dark"] {
+      --bg: radial-gradient(140% 140% at 20% 20%, #0b1220 0%, #0b1220 45%, #0f172a 100%);
+      --card: #0f172a;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --code-bg: #0b1220;
+      --code-border: #1f2937;
+      --accent: #60a5fa;
+      --accent-strong: #3b82f6;
+      --error: #f87171;
+      --border: #1e293b;
+      --shadow: 0 16px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      font-family: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .shell {
+      width: min(460px, 94vw);
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 28px 26px;
+      display: grid;
+      gap: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: rgba(37, 99, 235, 0.12);
+      padding: 6px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--accent-strong);
+    }
+
+    .pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .loader {
+      position: relative;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(226, 232, 240, 0.6);
+      overflow: hidden;
+    }
+
+    .loader::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -30%;
+      width: 30%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.25) 0%, var(--accent) 60%, rgba(37, 99, 235, 0.25) 100%);
+      animation: sweep 1.2s ease-in-out infinite;
+    }
+
+    @keyframes sweep {
+      0% {
+        left: -30%;
+      }
+
+      50% {
+        left: 70%;
+      }
+
+      100% {
+        left: 110%;
+      }
+    }
+
+    .detail {
+      background: var(--code-bg);
+      color: #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid var(--code-border);
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn.primary {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #1d4ed8;
+    }
+
+    .hint {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    body[data-state="error"] .pill {
+      background: #fee2e2;
+      color: var(--error);
+    }
+
+    body[data-state="error"] .loader {
+      display: none;
+    }
+
+    body[data-state="loading"] .detail {
+      display: none;
+    }
+  </style>
 </head>
+
 <body data-state="loading">
   <div class="shell">
     <div class="header">
-      <img class="logo" id="logo" src="assets/icon.png" alt="Pinokio" onerror="this.onerror=null;this.src='assets/icon_small.png'">
+      <img class="logo" id="logo" src="assets/icon.png" alt="Pinokio"
+        onerror="this.onerror=null;this.src='assets/icon_small.png'">
       <div>
         <p class="title" id="title">Iniciando o Pinokio…</p>
         <p class="subtitle" id="subtitle">Configurando serviços locais e preparando a UI.</p>
       </div>
     </div>
     <div class="pill" id="status-pill"><span class="dot"></span><span id="status-text">Preparando</span></div>
-    <div class="loader" id="loader"></div>
+
+    <!-- Skeleton Screen (Initial State) -->
+    <div id="loading-skeleton" class="skeleton-card" style="margin-top: 16px;">
+      <div class="skeleton-card-header">
+        <div class="skeleton skeleton-avatar"></div>
+        <div class="skeleton skeleton-text medium"></div>
+      </div>
+      <div class="skeleton-card-body">
+        <div class="skeleton skeleton-text long"></div>
+        <div class="skeleton skeleton-text short"></div>
+      </div>
+    </div>
+
+    <!-- Log Virtualization Container -->
+    <div id="log-view" class="log-container"
+      style="display: none; margin-top: 16px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; max-height: 200px;">
+      <pre class="log-line">Aguardando logs...</pre>
+    </div>
+
+    <div class="loader" id="loader" style="display: none;"></div>
     <pre class="detail" id="detail" hidden></pre>
     <div class="actions" id="actions">
       <button class="btn primary" id="retry" hidden>Reiniciar</button>
@@ -202,101 +261,139 @@ body[data-state="loading"] .detail {
     </div>
     <p class="hint" id="hint"></p>
   </div>
-<script nonce="pinokio-splash">
-  const nonce = crypto.randomUUID()
-  document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
-  const csp = document.getElementById('csp-meta')
-  if (csp) {
-    csp.setAttribute('content', csp.content.replace(/pinokio-splash/g, nonce))
-  }
-
-  const setTheme = () => {
-    const params = new URLSearchParams(window.location.search)
-    const themeParam = params.get('theme')
-    let theme = null
-    if (themeParam === 'dark' || themeParam === 'light') {
-      theme = themeParam
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      theme = 'dark'
+  <script nonce="pinokio-splash">
+    const nonce = crypto.randomUUID()
+    document.querySelectorAll('script[nonce]').forEach(el => el.setAttribute('nonce', nonce))
+    const csp = document.getElementById('csp-meta')
+    if (csp) {
+      csp.setAttribute('content', csp.content.replace(/pinokio-splash/g, nonce))
     }
-    if (theme) {
-      document.documentElement.dataset.theme = theme
-    }
-  }
-  setTheme()
 
-  const params = new URLSearchParams(window.location.search)
-  const accentParam = params.get('accent')
-  const isValidHex = (value) => /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(value || '')
-  if (accentParam && isValidHex(accentParam)) {
-    document.documentElement.style.setProperty('--accent', accentParam)
-    document.documentElement.style.setProperty('--accent-strong', accentParam)
-  }
-  const state = params.get('state') || 'loading'
-  const message = params.get('message') || 'Iniciando o Pinokio…'
-  const detail = params.get('detail')
-  const logPath = params.get('log') || 'Logs: ~/.pinokio/logs/stdout.txt'
-  const icon = params.get('icon')
-
-  const setText = (id, value) => {
-    const el = document.getElementById(id)
-    if (el) el.textContent = value
-  }
-
-  if (icon) {
-    const logo = document.getElementById('logo')
-    if (logo) logo.src = icon
-  }
-
-  document.body.dataset.state = state
-  setText('title', message)
-
-  const hintEl = document.getElementById('hint')
-  const statusText = document.getElementById('status-text')
-  const detailEl = document.getElementById('detail')
-  const retryBtn = document.getElementById('retry')
-  const copyBtn = document.getElementById('copy-log')
-
-  if (state === 'error') {
-    setText('subtitle', 'Algo impediu o Pinokio de iniciar.')
-    setText('status-text', 'Falhou')
-    document.getElementById('status-pill').style.background = '#fee2e2'
-    document.getElementById('status-pill').style.color = '#dc2626'
-    detailEl.textContent = detail && detail.trim().length ? detail : 'Confira os logs para mais detalhes.'
-    detailEl.hidden = false
-    retryBtn.hidden = false
-    copyBtn.hidden = false
-    hintEl.textContent = logPath
-  } else {
-    setText('subtitle', 'Isso deve levar apenas alguns segundos.')
-    setText('status-text', 'Preparando')
-    hintEl.textContent = 'Você pode manter esta janela aberta enquanto finalizamos a inicialização.'
-  }
-
-  retryBtn?.addEventListener('click', () => {
-    const params = new URLSearchParams(window.location.search)
-    const action = params.get('action')
-    if (action === 'choose-port') {
-      const current = params.get('port') || ''
-      const next = prompt('Informe uma porta livre', current || '42001')
-      if (next) {
-        params.set('port', next)
-        window.location.search = params.toString()
-        return
+    const setTheme = () => {
+      const params = new URLSearchParams(window.location.search)
+      const themeParam = params.get('theme')
+      let theme = null
+      if (themeParam === 'dark' || themeParam === 'light') {
+        theme = themeParam
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        theme = 'dark'
+      }
+      if (theme) {
+        document.documentElement.dataset.theme = theme
       }
     }
-    window.location.reload()
-  })
+    setTheme()
 
-  copyBtn?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(logPath)
-      copyBtn.textContent = 'Caminho copiado'
-      setTimeout(() => { copyBtn.textContent = 'Copiar caminho do log' }, 1800)
-    } catch (err) {
-      copyBtn.textContent = logPath
+    const params = new URLSearchParams(window.location.search)
+    const accentParam = params.get('accent')
+    const isValidHex = (value) => /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(value || '')
+    if (accentParam && isValidHex(accentParam)) {
+      document.documentElement.style.setProperty('--accent', accentParam)
+      document.documentElement.style.setProperty('--accent-strong', accentParam)
     }
-  })
-</script>
+    const state = params.get('state') || 'loading'
+    const message = params.get('message') || 'Iniciando o Pinokio…'
+    const detail = params.get('detail')
+    const logPath = params.get('log') || 'Logs: ~/.pinokio/logs/stdout.txt'
+    const icon = params.get('icon')
+
+    const setText = (id, value) => {
+      const el = document.getElementById(id)
+      if (el) el.textContent = value
+    }
+
+    if (icon) {
+      const logo = document.getElementById('logo')
+      if (logo) logo.src = icon
+    }
+
+    document.body.dataset.state = state
+    setText('title', message)
+
+    const hintEl = document.getElementById('hint')
+    const statusText = document.getElementById('status-text')
+    const detailEl = document.getElementById('detail')
+    const retryBtn = document.getElementById('retry')
+    const copyBtn = document.getElementById('copy-log')
+
+    if (state === 'error') {
+      setText('subtitle', 'Algo impediu o Pinokio de iniciar.')
+      setText('status-text', 'Falhou')
+      document.getElementById('status-pill').style.background = '#fee2e2'
+      document.getElementById('status-pill').style.color = '#dc2626'
+      detailEl.textContent = detail && detail.trim().length ? detail : 'Confira os logs para mais detalhes.'
+      detailEl.hidden = false
+      retryBtn.hidden = false
+      copyBtn.hidden = false
+      hintEl.textContent = logPath
+    } else {
+      setText('subtitle', 'Isso deve levar apenas alguns segundos.')
+      setText('status-text', 'Preparando')
+      hintEl.textContent = 'Você pode manter esta janela aberta enquanto finalizamos a inicialização.'
+    }
+
+    // Log Virtualization Logic
+    const logView = document.getElementById('log-view');
+    const MAX_LOG_LINES = 1000;
+    let logBuffer = [];
+
+    const addLogLine = (text) => {
+      if (!logView) return;
+      if (logView.style.display === 'none') {
+        logView.style.display = 'block';
+        document.getElementById('loading-skeleton').style.display = 'none';
+      }
+
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.textContent = text;
+
+      logView.appendChild(line);
+      logBuffer.push(line);
+
+      if (logBuffer.length > MAX_LOG_LINES) {
+        const removed = logBuffer.shift();
+        removed.remove();
+      }
+
+      // Auto-scroll if near bottom
+      const isAtBottom = logView.scrollHeight - logView.scrollTop <= logView.clientHeight + 50;
+      if (isAtBottom) {
+        logView.scrollTop = logView.scrollHeight;
+      }
+    };
+
+    // Listen for logs via tauriBridge if available
+    if (window.tauriBridge && window.tauriBridge.isTauri()) {
+      window.tauriBridge.listen('terminal:stdout', (event) => addLogLine(event.payload));
+      window.tauriBridge.listen('terminal:stderr', (event) => addLogLine(`[ERR] ${event.payload}`));
+    }
+
+    retryBtn?.addEventListener('click', () => {
+      const params = new URLSearchParams(window.location.search)
+      const action = params.get('action')
+      if (action === 'choose-port') {
+        const current = params.get('port') || ''
+        const next = prompt('Informe uma porta livre', current || '42001')
+        if (next) {
+          params.set('port', next)
+          window.location.search = params.toString()
+          return
+        }
+      }
+      window.location.reload()
+    })
+
+    copyBtn?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(logPath)
+        copyBtn.textContent = 'Caminho copiado'
+        setTimeout(() => { copyBtn.textContent = 'Copiar caminho do log' }, 1800)
+      } catch (err) {
+        copyBtn.textContent = logPath
+      }
+    })
+  </script>
 </body>
+
 </html>
