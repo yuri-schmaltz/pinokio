@@ -1,4 +1,4 @@
-const {app, screen, shell, BrowserWindow, BrowserView, ipcMain, dialog, clipboard, session, desktopCapturer } = require('electron')
+const { app, screen, shell, BrowserWindow, BrowserView, ipcMain, dialog, clipboard, session, desktopCapturer } = require('electron')
 const windowStateKeeper = require('electron-window-state');
 const fs = require('fs')
 const path = require("path")
@@ -10,6 +10,8 @@ const platform = os.platform()
 const { HARDEN_RENDERER, ALLOWED_PERMISSIONS, buildWebPreferences } = require('./webprefs')
 const { installPermissionHandler, installCertificateErrorHandler } = require('./permissions')
 const { checkPort } = require('./script/heartbeat')
+// Modular lib imports (available for gradual migration)
+const lib = require('./lib')
 var mainWindow;
 var root_url;
 var wins = {}
@@ -26,7 +28,7 @@ const setWindowTitleBarOverlay = (win, overlay) => {
   try {
     win.setTitleBarOverlay(overlay)
   } catch (e) {
-//    console.log("ERROR", e)
+    //    console.log("ERROR", e)
   }
 }
 const applyTitleBarOverlayToAllWindows = () => {
@@ -358,12 +360,12 @@ const inspectorMainLog = (label, payload) => {
     const line = `[InspectorMain] ${label}${serialized}\n`
     try {
       fs.appendFileSync(inspectorLogFile, line)
-    } catch (_) {}
+    } catch (_) { }
     process.stdout.write(line)
   } catch (_) {
     try {
       fs.appendFileSync(inspectorLogFile, `[InspectorMain] ${label}\n`)
-    } catch (_) {}
+    } catch (_) { }
     process.stdout.write(`[InspectorMain] ${label}\n`)
   }
 }
@@ -426,7 +428,7 @@ const findDescendantByUrl = (frame, targetUrl) => {
       if (currentUrl && urlsRoughlyMatch(normalizedTarget, currentUrl)) {
         return current
       }
-    } catch (_) {}
+    } catch (_) { }
     const children = Array.isArray(current.frames) ? current.frames : []
     for (const child of children) {
       if (child) {
@@ -659,23 +661,23 @@ const buildInspectorInjection = () => {
         }
         event.preventDefault()
         event.stopPropagation()
-        
+
         const target = event.target
         const html = target && target.outerHTML ? target.outerHTML : ''
         let screenshot = null
-        
+
         // Hide the overlay before taking screenshot to avoid capturing it
         if (overlay && overlay.style) {
           overlay.style.display = 'none'
         }
-        
+
         // Small delay to ensure overlay is hidden before screenshot
         await new Promise(resolve => setTimeout(resolve, 50))
-        
+
         try {
           // Use html2canvas-like approach to capture actual element rendering
           const rect = target.getBoundingClientRect()
-          
+
           // Send element bounds for screenshot capture
           const screenshotRequest = {
             type: 'screenshot',
@@ -690,17 +692,17 @@ const buildInspectorInjection = () => {
             __pinokioRelayStage: 0,
             __pinokioRelayComplete: window === window.top
           }
-          
+
           // Post screenshot request via postMessage to main page
           try {
             console.log('Attempting screenshot capture...')
             console.log('electronAPI available in iframe:', !!window.electronAPI)
             console.log('Screenshot request:', screenshotRequest)
-            
+
             // Send screenshot request to parent page via postMessage
             const response = await new Promise((resolve, reject) => {
               const messageId = 'screenshot_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-              
+
               const handleResponse = (event) => {
                 if (event.data && event.data.pinokioScreenshotResponse && event.data.messageId === messageId) {
                   window.removeEventListener('message', handleResponse)
@@ -711,22 +713,22 @@ const buildInspectorInjection = () => {
                   }
                 }
               }
-              
+
               window.addEventListener('message', handleResponse)
-              
+
               // Send request to parent page
               window.parent.postMessage({
                 pinokioScreenshotRequest: screenshotRequest,
                 messageId: messageId
               }, '*')
-              
+
               // Timeout after 3 seconds
               setTimeout(() => {
                 window.removeEventListener('message', handleResponse)
                 reject(new Error('Screenshot timeout'))
               }, 3000)
             })
-            
+
             screenshot = response
             console.log('Screenshot captured successfully via parent page')
           } catch (screenshotError) {
@@ -737,7 +739,7 @@ const buildInspectorInjection = () => {
           console.warn('Screenshot capture failed:', error)
           screenshot = null
         }
-        
+
         post('complete', {
           outerHTML: html,
           pathKeys: buildPathKeys(target),
@@ -786,7 +788,7 @@ const buildInspectorInjection = () => {
     } catch (error) {
       try {
         window.parent.postMessage({ pinokioInspector: { type: 'error', frameUrl: window.location.href, message: error && error.message ? error.message : String(error) } }, '*')
-      } catch (_) {}
+      } catch (_) { }
     }
   }
   return `(${source.toString()})();`
@@ -1192,7 +1194,7 @@ const stopInspectorSession = async (webContents) => {
   const frameUrl = session.frame && session.frame.url ? session.frame.url : ''
   try {
     await session.frame.executeJavaScript('window.__PINOKIO_INSPECTOR__ && window.__PINOKIO_INSPECTOR__.stop()', true)
-  } catch (_) {}
+  } catch (_) { }
   return { frameUrl }
 }
 
@@ -1281,13 +1283,13 @@ const installInspectorHandlers = () => {
     if (!screenshotRequest || !screenshotRequest.bounds) {
       throw new Error('Invalid screenshot request')
     }
-    
+
     // Get the inspector session to access the target frame
     const session = inspectorSessions.get(event.sender.id)
     if (!session || !session.frame) {
       throw new Error('No inspector session or frame found')
     }
-    
+
     try {
       const bounds = screenshotRequest.bounds
       const dpr = screenshotRequest.devicePixelRatio || 1
@@ -1350,7 +1352,7 @@ const installInspectorHandlers = () => {
         relayStage: screenshotRequest && typeof screenshotRequest.__pinokioRelayStage !== 'undefined' ? screenshotRequest.__pinokioRelayStage : null,
         relayComplete: screenshotRequest && typeof screenshotRequest.__pinokioRelayComplete !== 'undefined' ? screenshotRequest.__pinokioRelayComplete : null
       })
-      
+
       // Capture full page and crop to element bounds
       const fullImage = await event.sender.capturePage()
       const fullSize = fullImage.getSize()
@@ -1358,15 +1360,15 @@ const installInspectorHandlers = () => {
         senderId: event && event.sender ? event.sender.id : null,
         fullSize
       })
-      
+
       // Calculate crop bounds with frame position and device pixel ratio
       const cropBounds = {
         x: Math.round((bounds.x + framePosition.x) * dpr),
-        y: Math.round((bounds.y + framePosition.y) * dpr),  
+        y: Math.round((bounds.y + framePosition.y) * dpr),
         width: Math.round(bounds.width * dpr),
         height: Math.round(bounds.height * dpr)
       }
-      
+
       // Validate crop bounds
       cropBounds.x = Math.max(0, Math.min(cropBounds.x, fullSize.width - 1))
       cropBounds.y = Math.max(0, Math.min(cropBounds.y, fullSize.height - 1))
@@ -1379,7 +1381,7 @@ const installInspectorHandlers = () => {
         validatedCropBounds: cropBounds,
         fullSize
       })
-      
+
       const croppedImage = fullImage.crop(cropBounds)
       const buffer = croppedImage.toPNG()
       emitDebug('capture-success', {
@@ -1387,7 +1389,7 @@ const installInspectorHandlers = () => {
         cropWidth: cropBounds.width,
         cropHeight: cropBounds.height
       })
-      
+
       return 'data:image/png;base64,' + buffer.toString('base64')
     } catch (error) {
       console.error('Screenshot capture failed:', error)
@@ -1404,27 +1406,27 @@ const installInspectorHandlers = () => {
 const captureScreenshotRegion = async (bounds) => {
   try {
     const { nativeImage } = require('electron')
-    
+
     // Get all displays to find the correct one
     const displays = screen.getAllDisplays()
     const primaryDisplay = screen.getPrimaryDisplay()
-    
+
     // Get desktop capturer sources with full resolution
-    const sources = await desktopCapturer.getSources({ 
+    const sources = await desktopCapturer.getSources({
       types: ['screen'],
       thumbnailSize: {
         width: primaryDisplay.bounds.width * primaryDisplay.scaleFactor,
         height: primaryDisplay.bounds.height * primaryDisplay.scaleFactor
       }
     })
-    
+
     if (sources.length === 0) {
       throw new Error('No screen sources available')
     }
-    
+
     // Find the screen source that matches our primary display
     let screenSource = sources[0] // fallback to first source
-    
+
     // Try to find the exact screen source by name or use the first one
     for (const source of sources) {
       if (source.name.includes('Entire Screen') || source.name.includes('Screen 1')) {
@@ -1432,12 +1434,12 @@ const captureScreenshotRegion = async (bounds) => {
         break
       }
     }
-    
+
     // Get the full resolution screenshot from thumbnail
     const thumbnailImage = screenSource.thumbnail
     const fullScreenshotBuffer = thumbnailImage.toPNG()
     const fullScreenshot = nativeImage.createFromBuffer(fullScreenshotBuffer)
-    
+
     // Calculate the actual pixel bounds accounting for device pixel ratio
     const scaleFactor = primaryDisplay.scaleFactor
     const actualBounds = {
@@ -1452,20 +1454,20 @@ const captureScreenshotRegion = async (bounds) => {
         fullScreenshot.getSize().height - Math.round(bounds.y * scaleFactor)
       )
     }
-    
+
     // Ensure minimum size
     actualBounds.width = Math.max(1, actualBounds.width)
     actualBounds.height = Math.max(1, actualBounds.height)
-    
+
     // Crop the screenshot to the element bounds
     const croppedImage = fullScreenshot.crop(actualBounds)
-    
+
     // Convert to PNG buffer and then to data URL
     const croppedBuffer = croppedImage.toPNG()
     const dataUrl = 'data:image/png;base64,' + croppedBuffer.toString('base64')
-    
+
     console.log(`Screenshot captured: ${actualBounds.width}x${actualBounds.height} at (${actualBounds.x},${actualBounds.y})`)
-    
+
     return dataUrl
   } catch (error) {
     console.warn('Screenshot capture failed:', error)
@@ -1580,7 +1582,7 @@ const attach = (event, webContents) => {
       //  - if it's a remote host, open in external browser
       webContents.opened = true
     } else {
-//      console.log("will-navigate", { event, url })
+      //      console.log("will-navigate", { event, url })
       let host = new URL(url).host
       let localhost = new URL(root_url).host
       if (host !== localhost) {
@@ -1589,21 +1591,21 @@ const attach = (event, webContents) => {
       }
     }
   })
-//  webContents.session.defaultSession.loadExtension('path/to/unpacked/extension').then(({ id }) => {
-//  })
+  //  webContents.session.defaultSession.loadExtension('path/to/unpacked/extension').then(({ id }) => {
+  //  })
 
 
   webContents.session.webRequest.onHeadersReceived((details, callback) => {
-//    console.log("details", details)
-//    console.log("responseHeaders", JSON.stringify(details.responseHeaders, null, 2))
+    //    console.log("details", details)
+    //    console.log("responseHeaders", JSON.stringify(details.responseHeaders, null, 2))
 
 
 
     // 1. Remove X-Frame-Options
     if (details.responseHeaders["X-Frame-Options"]) {
-      delete details.responseHeaders["X-Frame-Options"] 
+      delete details.responseHeaders["X-Frame-Options"]
     } else if (details.responseHeaders["x-frame-options"]) {
-      delete details.responseHeaders["x-frame-options"] 
+      delete details.responseHeaders["x-frame-options"]
     }
 
     // 2. Remove Content-Security-Policy "frame-ancestors" attribute
@@ -1625,13 +1627,13 @@ const attach = (event, webContents) => {
 
 
     if (csp) {
-//      console.log("CSP", csp)
+      //      console.log("CSP", csp)
       // find /frame-ancestors ;$/
       let new_csp = csp.map((c) => {
         return c.replaceAll(/frame-ancestors[^;]+;?/gi, "")
       })
 
-//      console.log("new_csp = ", new_csp)
+      //      console.log("new_csp = ", new_csp)
 
       const r = {
         responseHeaders: details.responseHeaders
@@ -1641,11 +1643,11 @@ const attach = (event, webContents) => {
       } else if (csp_type === 1) {
         r.responseHeaders["content-security-policy"] = new_csp
       }
-//      console.log("R", JSON.stringify(r, null, 2))
+      //      console.log("R", JSON.stringify(r, null, 2))
 
       callback(r)
     } else {
-//      console.log("RH", details.responseHeaders)
+      //      console.log("RH", details.responseHeaders)
       callback({
         responseHeaders: details.responseHeaders
       })
@@ -1657,66 +1659,66 @@ const attach = (event, webContents) => {
   webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
 
     let ua = details.requestHeaders['User-Agent']
-//    console.log("User Agent Before", ua)
+    //    console.log("User Agent Before", ua)
     if (ua) {
       ua = ua.replace(/ pinokio\/[0-9.]+/i, '');
-      ua = ua.replace(/Electron\/.+ /i,'');
-//      console.log("User Agent After", ua)
+      ua = ua.replace(/Electron\/.+ /i, '');
+      //      console.log("User Agent After", ua)
       details.requestHeaders['User-Agent'] = ua;
     }
 
 
-//    console.log("REQ", details)
-//    console.log("HEADER BEFORE", details.requestHeaders)
-//    // Remove all sec-fetch-* headers
-//    for(let key in details.requestHeaders) {
-//      if (key.toLowerCase().startsWith("sec-")) {
-//        delete details.requestHeaders[key]
-//      }
-//    }
-//    console.log("HEADER AFTER", details.requestHeaders)
+    //    console.log("REQ", details)
+    //    console.log("HEADER BEFORE", details.requestHeaders)
+    //    // Remove all sec-fetch-* headers
+    //    for(let key in details.requestHeaders) {
+    //      if (key.toLowerCase().startsWith("sec-")) {
+    //        delete details.requestHeaders[key]
+    //      }
+    //    }
+    //    console.log("HEADER AFTER", details.requestHeaders)
     callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
 
 
-//  webContents.session.webRequest.onBeforeSendHeaders(
-//    (details, callback) => {
-//      const { requestHeaders } = details;
-//      UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*']);
-//      callback({ requestHeaders });
-//    },
-//  );
-//
-//  webContents.session.webRequest.onHeadersReceived((details, callback) => {
-//    const { responseHeaders } = details;
-//    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', ['*']);
-//    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', ['*']);
-//    callback({
-//      responseHeaders,
-//    });
-//  });
+  //  webContents.session.webRequest.onBeforeSendHeaders(
+  //    (details, callback) => {
+  //      const { requestHeaders } = details;
+  //      UpsertKeyValue(requestHeaders, 'Access-Control-Allow-Origin', ['*']);
+  //      callback({ requestHeaders });
+  //    },
+  //  );
+  //
+  //  webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  //    const { responseHeaders } = details;
+  //    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Origin', ['*']);
+  //    UpsertKeyValue(responseHeaders, 'Access-Control-Allow-Headers', ['*']);
+  //    callback({
+  //      responseHeaders,
+  //    });
+  //  });
 
-//  webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-//    //console.log("Before", { details })
-//    if (details.requestHeaders) details.requestHeaders['Origin'] = null;
-//    if (details.requestHeaders) details.requestHeaders['Referer'] = null;
-//    if (details.requestHeaders) details.requestHeaders['referer'] = null;
-//    if (details.headers) details.headers['Origin'] = null;
-//    if (details.headers) details.headers['Referer'] = null;
-//    if (details.headers) details.headers['referer'] = null;
-//
-//    if (details.referrer) details.referrer = null
-//    //console.log("After", { details })
-//    callback({ requestHeaders: details.requestHeaders })
-//  });
+  //  webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+  //    //console.log("Before", { details })
+  //    if (details.requestHeaders) details.requestHeaders['Origin'] = null;
+  //    if (details.requestHeaders) details.requestHeaders['Referer'] = null;
+  //    if (details.requestHeaders) details.requestHeaders['referer'] = null;
+  //    if (details.headers) details.headers['Origin'] = null;
+  //    if (details.headers) details.headers['Referer'] = null;
+  //    if (details.headers) details.headers['referer'] = null;
+  //
+  //    if (details.referrer) details.referrer = null
+  //    //console.log("After", { details })
+  //    callback({ requestHeaders: details.requestHeaders })
+  //  });
 
-//  webContents.on("did-create-window", (parentWindow, details) => {
-//    const view = new BrowserView();
-//    parentWindow.setBrowserView(view);
-//    view.setBounds({ x: 0, y: 30, width: parentWindow.getContentBounds().width, height: parentWindow.getContentBounds().height - 30 });
-//    view.setAutoResize({ width: true, height: true });
-//    view.webContents.loadURL(details.url);
-//  })
+  //  webContents.on("did-create-window", (parentWindow, details) => {
+  //    const view = new BrowserView();
+  //    parentWindow.setBrowserView(view);
+  //    view.setBounds({ x: 0, y: 30, width: parentWindow.getContentBounds().width, height: parentWindow.getContentBounds().height - 30 });
+  //    view.setAutoResize({ width: true, height: true });
+  //    view.webContents.loadURL(details.url);
+  //  })
   webContents.on('did-navigate', (event, url) => {
     let win = webContents.getOwnerBrowserWindow()
     if (win && typeof win.setTitleBarOverlay === "function") {
@@ -1737,7 +1739,7 @@ const attach = (event, webContents) => {
     let params = new URLSearchParams(features.split(",").join("&"))
     let win = wc.getOwnerBrowserWindow()
     let [width, height] = win.getSize()
-    let [x,y] = win.getPosition()
+    let [x, y] = win.getPosition()
 
 
     let origin = new URL(url).origin
@@ -1764,8 +1766,8 @@ const attach = (event, webContents) => {
           y: y + 30,
 
           parent: null,
-          titleBarStyle : "hidden",
-          titleBarOverlay : titleBarOverlay(colors),
+          titleBarStyle: "hidden",
+          titleBarOverlay: titleBarOverlay(colors),
           webPreferences: buildWebPreferences('window-open-localhost'),
         }
       }
@@ -1783,8 +1785,8 @@ const attach = (event, webContents) => {
               y: y + 30,
 
               parent: null,
-              titleBarStyle : "hidden",
-              titleBarOverlay : titleBarOverlay(colors),
+              titleBarStyle: "hidden",
+              titleBarOverlay: titleBarOverlay(colors),
               webPreferences: buildWebPreferences('window-open-app'),
 
             }
@@ -1809,59 +1811,59 @@ const attach = (event, webContents) => {
       }
     }
 
-//    if (origin === root_url) {
-//      // if the origin is the same as pinokio, open in pinokio
-//      // otherwise open in external browser
-//      if (features) {
-//        if (features.startsWith("app") || features.startsWith("self")) {
-//          return {
-//            action: 'allow',
-//            outlivesOpener: true,
-//            overrideBrowserWindowOptions: {
-//              width: (params.get("width") ? parseInt(params.get("width")) : width),
-//              height: (params.get("height") ? parseInt(params.get("height")) : height),
-//              x: x + 30,
-//              y: y + 30,
-//
-//              parent: null,
-//              titleBarStyle : "hidden",
-//              titleBarOverlay : titleBarOverlay("default"),
-//            }
-//          }
-//        } else if (features.startsWith("file")) {
-//          let u = features.replace("file://", "")
-//          shell.showItemInFolder(u)
-//          return { action: 'deny' };
-//        } else {
-//          return { action: 'deny' };
-//        }
-//      } else {
-//        if (features.startsWith("file")) {
-//          let u = features.replace("file://", "")
-//          shell.showItemInFolder(u)
-//          return { action: 'deny' };
-//        } else {
-//          shell.openExternal(url);
-//          return { action: 'deny' };
-//        }
-//      }
-//    } else {
-//      if (features.startsWith("file")) {
-//        let u = features.replace("file://", "")
-//        shell.showItemInFolder(u)
-//        return { action: 'deny' };
-//      } else {
-//        shell.openExternal(url);
-//        return { action: 'deny' };
-//      }
-//    }
+    //    if (origin === root_url) {
+    //      // if the origin is the same as pinokio, open in pinokio
+    //      // otherwise open in external browser
+    //      if (features) {
+    //        if (features.startsWith("app") || features.startsWith("self")) {
+    //          return {
+    //            action: 'allow',
+    //            outlivesOpener: true,
+    //            overrideBrowserWindowOptions: {
+    //              width: (params.get("width") ? parseInt(params.get("width")) : width),
+    //              height: (params.get("height") ? parseInt(params.get("height")) : height),
+    //              x: x + 30,
+    //              y: y + 30,
+    //
+    //              parent: null,
+    //              titleBarStyle : "hidden",
+    //              titleBarOverlay : titleBarOverlay("default"),
+    //            }
+    //          }
+    //        } else if (features.startsWith("file")) {
+    //          let u = features.replace("file://", "")
+    //          shell.showItemInFolder(u)
+    //          return { action: 'deny' };
+    //        } else {
+    //          return { action: 'deny' };
+    //        }
+    //      } else {
+    //        if (features.startsWith("file")) {
+    //          let u = features.replace("file://", "")
+    //          shell.showItemInFolder(u)
+    //          return { action: 'deny' };
+    //        } else {
+    //          shell.openExternal(url);
+    //          return { action: 'deny' };
+    //        }
+    //      }
+    //    } else {
+    //      if (features.startsWith("file")) {
+    //        let u = features.replace("file://", "")
+    //        shell.showItemInFolder(u)
+    //        return { action: 'deny' };
+    //      } else {
+    //        shell.openExternal(url);
+    //        return { action: 'deny' };
+    //      }
+    //    }
   });
 }
 const getWinState = (url, options) => {
   let filename
   try {
     let pathname = new URL(url).pathname.slice(1)
-    filename = pathname.slice("/").join("-")
+    filename = pathname.split("/").join("-")
   } catch {
     filename = "index.json"
   }
@@ -1875,14 +1877,14 @@ const createWindow = (port) => {
 
 
   let mainWindowState = windowStateKeeper({
-//    file: "index.json",
+    //    file: "index.json",
     defaultWidth: 1000,
     defaultHeight: 800
   });
 
   mainWindow = new BrowserWindow({
-    titleBarStyle : "hidden",
-    titleBarOverlay : titleBarOverlay(colors),
+    titleBarStyle: "hidden",
+    titleBarOverlay: titleBarOverlay(colors),
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -1910,14 +1912,14 @@ const createWindow = (port) => {
 
   // Enable screen capture permissions
   installPermissionHandler(mainWindow.webContents.session, ALLOWED_PERMISSIONS, 'mainWindow')
-//  enable_cors(mainWindow)
-  if("" + port === "80") {
+  //  enable_cors(mainWindow)
+  if ("" + port === "80") {
     root_url = `http://localhost`
   } else {
     root_url = `http://localhost:${port}`
   }
   mainWindow.loadURL(root_url)
-//  mainWindow.maximize();
+  //  mainWindow.maximize();
   mainWindowState.manage(mainWindow);
 
 }
@@ -1925,14 +1927,14 @@ const loadNewWindow = (url, port) => {
 
 
   let winState = windowStateKeeper({
-//    file: "index.json",
+    //    file: "index.json",
     defaultWidth: 1000,
     defaultHeight: 800
   });
 
   let win = new BrowserWindow({
-    titleBarStyle : "hidden",
-    titleBarOverlay : titleBarOverlay(colors),
+    titleBarStyle: "hidden",
+    titleBarOverlay: titleBarOverlay(colors),
     x: winState.x,
     y: winState.y,
     width: winState.width,
@@ -1944,7 +1946,7 @@ const loadNewWindow = (url, port) => {
   // Enable screen capture permissions
   installPermissionHandler(win.webContents.session, ALLOWED_PERMISSIONS, 'secondaryWindow')
 
-//  enable_cors(win)
+  //  enable_cors(win)
   win.focus()
   win.loadURL(url)
   winState.manage(win)
@@ -1983,9 +1985,9 @@ if (!gotTheLock) {
     //let u = new URL(url).search
     let u = url.replace(/pinokio:[\/]+/, "")
     loadNewWindow(`${root_url}/pinokio/${u}`, PORT)
-//    if (BrowserWindow.getAllWindows().length === 0 || !mainWindow) createWindow(PORT)
-//    mainWindow.focus()
-//    mainWindow.loadURL(`${root_url}/pinokio/${u}`)
+    //    if (BrowserWindow.getAllWindows().length === 0 || !mainWindow) createWindow(PORT)
+    //    mainWindow.focus()
+    //    mainWindow.loadURL(`${root_url}/pinokio/${u}`)
   })
 
   // Create mainWindow, load the rest of the app, etc...
@@ -1993,7 +1995,7 @@ if (!gotTheLock) {
   app.commandLine.appendSwitch('disable-features', 'LazyImageLoading')
   app.commandLine.appendSwitch('enable-experimental-web-platform-features');
   app.commandLine.appendSwitch('enable-features', 'GetDisplayMediaSet,GetDisplayMediaSetAutoSelectAllScreens');
-  
+
   app.whenReady().then(async () => {
     console.log('App is ready, about to install inspector handlers...')
     app.userAgentFallback = "Pinokio"
@@ -2002,24 +2004,24 @@ if (!gotTheLock) {
 
     // PROMPT
     let promptResponse
-    ipcMain.on('prompt', function(eventRet, arg) {
+    ipcMain.on('prompt', function (eventRet, arg) {
       promptResponse = null
       const point = screen.getCursorScreenPoint()
       const display = screen.getDisplayNearestPoint(point)
       const bounds = display.bounds
 
-//      const bounds = focused.getBounds()
+      //      const bounds = focused.getBounds()
       let promptWindow = new BrowserWindow({
-        x: bounds.x + bounds.width/2 - 200,
-        y: bounds.y + bounds.height/2 - 60,
+        x: bounds.x + bounds.width / 2 - 200,
+        y: bounds.y + bounds.height / 2 - 60,
         width: 400,
         height: 120,
         //width: 1000,
         //height: 500,
         show: false,
         resizable: false,
-//        movable: false,
-//        alwaysOnTop: true,
+        //        movable: false,
+        //        alwaysOnTop: true,
         frame: false,
         webPreferences: buildWebPreferences('promptWindow'),
       })
@@ -2031,7 +2033,6 @@ if (!gotTheLock) {
 <style>body {font-family: sans-serif;} form {padding: 5px; } button {float:right; margin-left: 10px;} label { display: block; margin-bottom: 5px; width: 100%; } input {margin-bottom: 10px; padding: 5px; width: 100%; display:block;}</style>
 <script>
 document.querySelector("#cancel").addEventListener("click", (e) => {
-  debugger
   e.preventDefault()
   e.stopPropagation()
   window.close()
@@ -2039,26 +2040,24 @@ document.querySelector("#cancel").addEventListener("click", (e) => {
 document.querySelector("form").addEventListener("submit", (e) => {
   e.preventDefault()
   e.stopPropagation()
-  debugger
   window.electronAPI.send('prompt-response', document.querySelector("#val").value)
   window.close()
 })
 </script></body></html>`
 
-//      promptWindow.loadFile("prompt.html")
+      //      promptWindow.loadFile("prompt.html")
       promptWindow.loadURL('data:text/html,' + encodeURIComponent(promptHtml))
       promptWindow.show()
-      promptWindow.on('closed', function() {
+      promptWindow.on('closed', function () {
         console.log({ promptResponse })
-        debugger
         eventRet.returnValue = promptResponse
         promptWindow = null
       })
 
     })
-    ipcMain.on('prompt-response', function(event, arg) {
-      if (arg === ''){ arg = null }
-      console.log("prompt-response", { arg})
+    ipcMain.on('prompt-response', function (event, arg) {
+      if (arg === '') { arg = null }
+      console.log("prompt-response", { arg })
       promptResponse = arg
     })
 
@@ -2102,10 +2101,10 @@ document.querySelector("form").addEventListener("submit", (e) => {
         browser: {
           clearCache: async () => {
             console.log('clear cache from all sessions')
-            
+
             // Clear default session
             await session.defaultSession.clearStorageData()
-            
+
             // Clear all custom sessions from active windows
             const windows = BrowserWindow.getAllWindows()
             for (const window of windows) {
@@ -2113,7 +2112,7 @@ document.querySelector("form").addEventListener("submit", (e) => {
                 await window.webContents.session.clearStorageData()
               }
             }
-            
+
             console.log("cleared all sessions")
           }
         }
@@ -2130,11 +2129,21 @@ document.querySelector("form").addEventListener("submit", (e) => {
     app.on('activate', function () {
       if (BrowserWindow.getAllWindows().length === 0) createWindow(PORT)
     })
-    app.on('before-quit', function(e) {
+    app.on('before-quit', function (e) {
       if (pinokiod.kernel.kill) {
         e.preventDefault()
         console.log('Cleaning up before quit', process.pid);
-        pinokiod.kernel.kill()
+        // Set a timeout to force exit if cleanup takes too long
+        const forceExitTimeout = setTimeout(() => {
+          console.warn('[SHUTDOWN] Force exit after 5s timeout');
+          app.exit(0);
+        }, 5000);
+        try {
+          pinokiod.kernel.kill()
+        } catch (err) {
+          console.error('[SHUTDOWN] Error during kernel.kill:', err);
+        }
+        clearTimeout(forceExitTimeout);
       }
     });
     app.on('window-all-closed', function () {
@@ -2160,29 +2169,29 @@ document.querySelector("form").addEventListener("submit", (e) => {
     })
     app.on('open-url', (event, url) => {
       let u = url.replace(/pinokio:[\/]+/, "")
-  //    let u = new URL(url).search
-  //    console.log("u", u)
+      //    let u = new URL(url).search
+      //    console.log("u", u)
       loadNewWindow(`${root_url}/pinokio/${u}`, PORT)
 
-//      if (BrowserWindow.getAllWindows().length === 0 || !mainWindow) createWindow(PORT)
-//      const topWindow = BrowserWindow.getFocusedWindow();
-//      console.log("top window", topWindow)
-//      //mainWindow.focus()
-//      //mainWindow.loadURL(`${root_url}/pinokio/${u}`)
-//      topWindow.focus()
-//      topWindow.loadURL(`${root_url}/pinokio/${u}`)
+      //      if (BrowserWindow.getAllWindows().length === 0 || !mainWindow) createWindow(PORT)
+      //      const topWindow = BrowserWindow.getFocusedWindow();
+      //      console.log("top window", topWindow)
+      //      //mainWindow.focus()
+      //      //mainWindow.loadURL(`${root_url}/pinokio/${u}`)
+      //      topWindow.focus()
+      //      topWindow.loadURL(`${root_url}/pinokio/${u}`)
     })
-//    app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
+    //    app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
     let all = BrowserWindow.getAllWindows()
-    for(win of all) {
+    for (win of all) {
       try {
         if (win && typeof win.setTitleBarOverlay === 'function') {
           const overlay = titleBarOverlay(colors)
           setWindowTitleBarOverlay(win, overlay)
         }
       } catch (e) {
-  //      console.log("E2", e)
+        //      console.log("E2", e)
       }
     }
     createWindow(PORT)

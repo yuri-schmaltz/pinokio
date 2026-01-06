@@ -22,7 +22,9 @@
     "fix": "brew install fpm",
     "test": "npm run test:smoke",
     "test:smoke": "mocha \"test/smoke/**/*.test.js\"",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "lint": "eslint *.js script/*.js test/**/*.js",
+    "bench": "node test/perf/benchmark.js"
   },
   "build": {
     "appId": "computer.pinokio",
@@ -154,6 +156,7 @@
     "electron": "39.2.3",
     "electron-builder": "26.2.0",
     "electron-builder-notarize": "^1.5.2",
+    "eslint": "^8.57.0",
     "mocha": "^10.7.3",
     "@playwright/test": "^1.49.0",
     "proxyquire": "^2.1.3",

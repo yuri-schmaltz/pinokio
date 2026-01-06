@@ -74,3 +74,24 @@ Of course, there are also additional checks such as:
 3. Making sure that the install and launch instructions actually follow the recommended instructions suggested in the original project's README.
 
 No scripts are approved until rigorously tested.
+
+# Environment Variables
+
+The following environment variables can be used to configure Pinokio:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PINOKIO_HARDEN_RENDERER` | Set to `1` to enable hardened renderer mode (contextIsolation, webSecurity, no Node in subframes) | `0` (disabled) |
+| `PINOKIO_BROWSER_LOG` | Set to `1` to enable browser console logging to file | `0` (disabled) |
+| `PINOKIO_TEST_MODE` | Set to `1` to use mock pinokiod implementation (for testing) | `0` (disabled) |
+
+### Linux-specific Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ELECTRON_OZONE_PLATFORM_HINT` | Hint for Ozone platform selection (e.g., `wayland`, `x11`) |
+| `ELECTRON_DISABLE_GPU` | Set to `1` to disable GPU acceleration |
+| `DISPLAY` | X11 display (auto-detected) |
+| `WAYLAND_DISPLAY` | Wayland display (auto-detected) |
+
+For more security information, see [SECURITY.md](SECURITY.md).
