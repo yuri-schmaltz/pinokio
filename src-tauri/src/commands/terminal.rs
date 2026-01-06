@@ -10,6 +10,7 @@ use tokio::process::Command;
 #[tauri::command]
 pub async fn run_command(
     window: Window,
+    state: tauri::State<'_, super::process_manager::ProcessManagerState>,
     cmd: String,
     args: Vec<String>,
     cwd: Option<String>,
@@ -28,7 +29,21 @@ pub async fn run_command(
         .spawn()
         .map_err(|e| format!("Failed to spawn process: {}", e))?;
 
-    // Stream stdout
+    let pid = child.id().unwrap_or(0);
+    
+    // Register process
+    if pid > 0 {
+        let mut processes = state.processes.lock().unwrap();
+        processes.insert(pid, super::process_manager::ProcessInfo {
+            pid,
+            name: cmd.clone(),
+            status: "Running".to_string(),
+            cpu_usage: 0.0,
+            mem_usage: 0,
+        });
+    }
+
+    // Stream stdout (omitted for brevity in logic but maintained in actual code)
     if let Some(stdout) = child.stdout.take() {
         let window_clone = window.clone();
         tokio::spawn(async move {
@@ -56,6 +71,12 @@ pub async fn run_command(
         .wait()
         .await
         .map_err(|e| format!("Wait failed: {}", e))?;
+
+    // Unregister process
+    if pid > 0 {
+        let mut processes = state.processes.lock().unwrap();
+        processes.remove(&pid);
+    }
 
     Ok(status.code().unwrap_or(-1))
 }

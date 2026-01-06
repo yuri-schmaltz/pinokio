@@ -10,7 +10,7 @@ mod commands;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent, Manager};
+use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent, Manager, GlobalShortcutManager};
 use commands::process_manager::{ProcessManagerState, ProcessInfo};
 
 fn main() {
@@ -30,6 +30,25 @@ fn main() {
     tauri::Builder::default()
         .manage(process_state)
         .system_tray(system_tray)
+        .plugin(tauri_plugin_store::Builder::default().build())
+        .setup(|app| {
+            let handle = app.handle();
+            let mut shortcut_manager = handle.global_shortcut_manager();
+            
+            // Register global shortcut to toggle window
+            let _ = shortcut_manager.register("CmdOrCtrl+Shift+P", move || {
+                if let Some(window) = handle.get_window("main") {
+                    if window.is_visible().unwrap_or(false) {
+                        let _ = window.hide();
+                    } else {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
+            });
+            
+            Ok(())
+        })
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::LeftClick { .. } => {
                 if let Some(window) = app.get_window("main") {

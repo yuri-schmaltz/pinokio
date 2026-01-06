@@ -62,13 +62,19 @@ pub fn detect_conda() -> Result<String, String> {
 /// Get system resource usage (Global).
 #[tauri::command]
 pub fn get_system_resources() -> Result<HashMap<String, f64>, String> {
+    use sysinfo::{System, SystemExt};
+    let mut sys = System::new_all();
+    sys.refresh_all();
+
     let mut resources = HashMap::new();
     
-    // In a real implementation, we would use 'sysinfo' crate.
-    // For now, return mock data to demonstrate the IPC.
-    resources.insert("cpu_total".to_string(), 12.5);
-    resources.insert("mem_used_gb".to_string(), 4.2);
-    resources.insert("mem_total_gb".to_string(), 16.0);
+    resources.insert("cpu_total".to_string(), sys.global_cpu_info().cpu_usage() as f64);
+    
+    let used_mem = sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0; // GB
+    let total_mem = sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0; // GB
+    
+    resources.insert("mem_used_gb".to_string(), used_mem);
+    resources.insert("mem_total_gb".to_string(), total_mem);
     
     Ok(resources)
 }
