@@ -62,7 +62,7 @@ pub fn detect_conda() -> Result<String, String> {
 /// Get system resource usage (Global).
 #[tauri::command]
 pub fn get_system_resources() -> Result<HashMap<String, f64>, String> {
-    use sysinfo::{System, SystemExt};
+    use sysinfo::System;
     let mut sys = System::new_all();
     sys.refresh_all();
 
