@@ -63,6 +63,30 @@ fn main() {
                 }
             });
 
+            // Check for updates
+            let updater_handle = app.handle();
+            tauri::async_runtime::spawn(async move {
+                log_to_file("[UPDATER] Checking for updates...");
+                match updater_handle.updater().check().await {
+                    Ok(update) => {
+                        if update.is_update_available() {
+                            log_to_file("[UPDATER] Update available! Downloading and installing...");
+                            if let Err(e) = update.download_and_install().await {
+                                log_to_file(&format!("[UPDATER] Failed to update: {}", e));
+                            } else {
+                                log_to_file("[UPDATER] Update installed. Restarting application...");
+                                updater_handle.restart();
+                            }
+                        } else {
+                            log_to_file("[UPDATER] No updates available.");
+                        }
+                    }
+                    Err(e) => {
+                        log_to_file(&format!("[UPDATER] Failed to check for updates: {}", e));
+                    }
+                }
+            });
+
             // Spawn Pinokio Backend
             let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
