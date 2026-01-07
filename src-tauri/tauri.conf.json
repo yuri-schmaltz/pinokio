@@ -88,7 +88,8 @@
                 "width": 1200,
                 "center": true,
                 "decorations": true,
-                "transparent": false
+                "transparent": false,
+                "url": "splash.html"
             }
         ]
     }
