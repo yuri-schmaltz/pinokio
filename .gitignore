@@ -4,3 +4,4 @@ cache
 package-lock.json
 .claude
 src-tauri/target
+src-tauri/node_modules_vendor
