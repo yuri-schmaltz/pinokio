@@ -128,7 +128,19 @@ fn main() {
 
                 
                 let mut cmd = Command::new("node");
-                cmd.arg(script_path);
+                cmd.arg(&script_path);
+                
+                // Fix for bundled environment: Set NODE_PATH to node_modules_vendor
+                if let Some(script_dir) = script_path_buf.parent() {
+                    if let Some(pkg_dir) = script_dir.parent() {
+                        if let Some(vendor_dir) = pkg_dir.parent() {
+                             let vendor_path = vendor_dir.to_string_lossy().to_string();
+                             log_to_file(&format!("[PINOKIO FIX] Setting NODE_PATH to: {}", vendor_path));
+                             cmd.env("NODE_PATH", vendor_path);
+                        }
+                    }
+                }
+
                 cmd.stdout(Stdio::piped());
                 cmd.stderr(Stdio::piped());
 
