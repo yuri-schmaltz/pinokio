@@ -10,7 +10,11 @@ mod commands;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+
+use std::process::Stdio;
 use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent, Manager, GlobalShortcutManager};
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Command;
 use commands::process_manager::{ProcessManagerState, ProcessInfo};
 
 fn main() {
@@ -43,6 +47,65 @@ fn main() {
                     } else {
                         let _ = window.show();
                         let _ = window.set_focus();
+                    }
+                }
+            });
+
+            // Spawn Pinokio Backend
+            let app_handle = app.handle();
+            tauri::async_runtime::spawn(async move {
+                let script_path = "../node_modules/pinokiod/script/index.js";
+                // Try to find the script in common locations if relative path fails (dev vs prod)
+                // specific for dev environment as requested
+                
+                let mut cmd = Command::new("node");
+                cmd.arg(script_path);
+                cmd.stdout(Stdio::piped());
+                cmd.stderr(Stdio::piped());
+
+                match cmd.spawn() {
+                    Ok(mut child) => {
+                        let stdout = child.stdout.take().expect("Failed to open stdout");
+                        let stderr = child.stderr.take().expect("Failed to open stderr");
+                        
+                        let window_handle = app_handle.clone();
+                        let window_handle_err = app_handle.clone();
+
+                        // Stream stdout
+                        tokio::spawn(async move {
+                            let reader = BufReader::new(stdout);
+                            let mut lines = reader.lines();
+                            while let Ok(Some(line)) = lines.next_line().await {
+                                println!("[PINOKIO] {}", line); // Log to terminal
+                                if let Some(window) = window_handle.get_window("main") {
+                                    let _ = window.emit("terminal:stdout", &line);
+                                    if line.contains("Server listening on port") {
+                                         let _ = window.emit("terminal:stdout", "Server ready, launching...");
+                                         // Small delay to ensure server is fully ready to accept connections
+                                         tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
+                                         let _ = window.eval("window.location.replace('http://localhost:42000')");
+                                    }
+                                }
+                            }
+                        });
+
+                        // Stream stderr
+                        tokio::spawn(async move {
+                            let reader = BufReader::new(stderr);
+                            let mut lines = reader.lines();
+                            while let Ok(Some(line)) = lines.next_line().await {
+                                eprintln!("[PINOKIO ERR] {}", line);
+                                if let Some(window) = window_handle_err.get_window("main") {
+                                    let _ = window.emit("terminal:stderr", &line);
+                                }
+                            }
+                        });
+                    }
+                    Err(e) => {
+                         eprintln!("Failed to spawn node process: {}", e);
+                         if let Some(window) = app_handle.get_window("main") {
+                             let _ = window.emit("terminal:stderr", &format!("Failed to spawn backend: {}", e));
+                         }
                     }
                 }
             });
