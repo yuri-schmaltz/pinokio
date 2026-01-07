@@ -54,9 +54,10 @@ fn main() {
             // Spawn Pinokio Backend
             let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
-                let script_path = "../node_modules/pinokiod/script/index.js";
-                // Try to find the script in common locations if relative path fails (dev vs prod)
-                // specific for dev environment as requested
+                let script_path = app_handle
+                    .path_resolver()
+                    .resolve_resource("../node_modules/pinokiod/script/index.js")
+                    .expect("failed to resolve resource");
                 
                 let mut cmd = Command::new("node");
                 cmd.arg(script_path);

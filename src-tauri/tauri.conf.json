@@ -60,7 +60,10 @@
                 "providerShortName": null,
                 "signingIdentity": null
             },
-            "resources": [],
+            "resources": [
+                "../node_modules",
+                "../package.json"
+            ],
             "shortDescription": "Pinokio - 1-click launcher for AI",
             "targets": "all",
             "windows": {
