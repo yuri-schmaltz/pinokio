@@ -3,4 +3,3 @@ dist
 cache
 package-lock.json
 .claude
-src-tauri/target
