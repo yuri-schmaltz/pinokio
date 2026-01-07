@@ -17,7 +17,19 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use commands::process_manager::{ProcessManagerState, ProcessInfo};
 
+fn log_to_file(msg: &str) {
+    use std::fs::OpenOptions;
+    use std::io::Write;
+    let _ = std::fs::create_dir_all("/tmp");
+    if let Ok(mut file) = OpenOptions::new().create(true).append(true).open("/tmp/pinokio_debug.log") {
+         let _ = writeln!(file, "{}", msg);
+    }
+}
+
 fn main() {
+    log_to_file("----------------------------------------");
+    log_to_file("Pinokio Starting...");
+
     // System tray menu
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let show = CustomMenuItem::new("show".to_string(), "Show Window");
@@ -54,10 +66,66 @@ fn main() {
             // Spawn Pinokio Backend
             let app_handle = app.handle();
             tauri::async_runtime::spawn(async move {
-                let script_path = app_handle
+                log_to_file("Attempting to spawn backend...");
+                
+                // Diagnostic: Try to resolve with "node_modules" prefix and log paths
+                // We changed the resource to "node_modules_vendor" in tauri.conf.json
+                let resource_path = "node_modules_vendor/pinokiod/script/index.js";
+
+                let script_path_buf = app_handle
                     .path_resolver()
-                    .resolve_resource("../node_modules/pinokiod/script/index.js")
-                    .expect("failed to resolve resource");
+                    .resolve_resource(resource_path)
+                    .unwrap_or_else(|| {
+                         let msg = "[PINOKIO DIAG] Failed to resolve primary resource path, trying fallback...";
+                         log_to_file(msg);
+                         println!("{}", msg);
+                         // If the vendor link failed, maybe it's flattened? 
+                         // But we expect it to be "node_modules_vendor"
+                         app_handle.path_resolver().resolve_resource("node_modules/pinokiod/script/index.js")
+                            .expect("failed to resolve resource (fallback)")
+                    });
+                
+                let script_path = script_path_buf.to_string_lossy().to_string();
+                let msg = format!("[PINOKIO DIAG] Resolved script path: {}", script_path);
+                log_to_file(&msg);
+                println!("{}", msg);
+
+                // DIAGNOSTIC: List files around the target
+                log_to_file("[PINOKIO DIAG] Listing parent directory of script:");
+                if let Some(parent) = std::path::Path::new(&script_path).parent() {
+                     let output = std::process::Command::new("ls")
+                        .arg("-la")
+                        .arg(parent)
+                        .output();
+                     if let Ok(o) = output {
+                         log_to_file(&format!("ls parent: {:?}", String::from_utf8_lossy(&o.stdout)));
+                     }
+                        
+                     log_to_file("[PINOKIO DIAG] Listing node_modules directory:");
+                     if let Some(gradparent) = parent.parent() { // pinokiod
+                         if let Some(greatgrandparent) = gradparent.parent() { // node_modules
+                             let output = std::process::Command::new("ls")
+                                .arg("-la")
+                                .arg(greatgrandparent)
+                                .output();
+                             if let Ok(o) = output {
+                                 log_to_file(&format!("ls node_modules: {:?}", String::from_utf8_lossy(&o.stdout)));
+                             }
+                                
+                             // Also list root of mount if possible
+                             if let Some(root) = greatgrandparent.parent() {
+                                  let output = std::process::Command::new("ls")
+                                    .arg("-la")
+                                    .arg(root)
+                                    .output();
+                                 if let Ok(o) = output {
+                                     log_to_file(&format!("ls root: {:?}", String::from_utf8_lossy(&o.stdout)));
+                                 }
+                             }
+                         }
+                     }
+                }
+
                 
                 let mut cmd = Command::new("node");
                 cmd.arg(script_path);
@@ -66,6 +134,7 @@ fn main() {
 
                 match cmd.spawn() {
                     Ok(mut child) => {
+                        log_to_file("Node process spawned successfully.");
                         let stdout = child.stdout.take().expect("Failed to open stdout");
                         let stderr = child.stderr.take().expect("Failed to open stderr");
                         
@@ -77,6 +146,7 @@ fn main() {
                             let reader = BufReader::new(stdout);
                             let mut lines = reader.lines();
                             while let Ok(Some(line)) = lines.next_line().await {
+                                log_to_file(&format!("[NODE STDOUT] {}", line));
                                 println!("[PINOKIO] {}", line); // Log to terminal
                                 if let Some(window) = window_handle.get_window("main") {
                                     let _ = window.emit("terminal:stdout", &line);
@@ -84,6 +154,7 @@ fn main() {
                                          let _ = window.emit("terminal:stdout", "Server ready, launching...");
                                          // Small delay to ensure server is fully ready to accept connections
                                          tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
+                                         log_to_file("Server ready, redirecting...");
                                          let _ = window.eval("window.location.replace('http://localhost:42000')");
                                     }
                                 }
@@ -95,6 +166,7 @@ fn main() {
                             let reader = BufReader::new(stderr);
                             let mut lines = reader.lines();
                             while let Ok(Some(line)) = lines.next_line().await {
+                                log_to_file(&format!("[NODE STDERR] {}", line));
                                 eprintln!("[PINOKIO ERR] {}", line);
                                 if let Some(window) = window_handle_err.get_window("main") {
                                     let _ = window.emit("terminal:stderr", &line);
@@ -103,7 +175,9 @@ fn main() {
                         });
                     }
                     Err(e) => {
-                         eprintln!("Failed to spawn node process: {}", e);
+                         let msg = format!("Failed to spawn node process: {}", e);
+                         log_to_file(&msg);
+                         eprintln!("{}", msg);
                          if let Some(window) = app_handle.get_window("main") {
                              let _ = window.emit("terminal:stderr", &format!("Failed to spawn backend: {}", e));
                          }

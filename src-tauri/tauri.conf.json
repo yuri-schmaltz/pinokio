@@ -61,8 +61,8 @@
                 "signingIdentity": null
             },
             "resources": [
-                "../node_modules",
-                "../package.json"
+                "node_modules_vendor",
+                "package.json.vendor"
             ],
             "shortDescription": "Pinokio - 1-click launcher for AI",
             "targets": "all",
@@ -73,7 +73,7 @@
             }
         },
         "security": {
-            "csp": "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss: http: https:"
+            "csp": "default-src 'self' http://localhost:42000; img-src 'self' data: https: http://localhost:42000; style-src 'self' 'unsafe-inline' http://localhost:42000; script-src 'self' 'unsafe-inline' http://localhost:42000; connect-src 'self' ws: wss: http: https: http://localhost:42000;"
         },
         "systemTray": {
             "iconPath": "icons/icon.png",
