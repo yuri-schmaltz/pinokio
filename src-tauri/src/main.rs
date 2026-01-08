@@ -26,9 +26,49 @@ fn log_to_file(msg: &str) {
     }
 }
 
+fn kill_zombies() {
+    log_to_file("[CLEANUP] Checking for zombie processes on port 42000...");
+    
+    // 1. Force kill anything on port 42000
+    // We use "sh -c" to leverage shell pipes for lsof | xargs
+    let output_port = std::process::Command::new("sh")
+        .arg("-c")
+        .arg("lsof -t -i:42000 | xargs -r kill -9")
+        .output();
+
+    match output_port {
+        Ok(o) => {
+            log_to_file(&format!("[CLEANUP] Port 42000 sweep complete. Success: {}", o.status.success()));
+        },
+        Err(e) => {
+            log_to_file(&format!("[CLEANUP] Warning: Failed to sweep port 42000: {}", e));
+        }
+    }
+
+    // 2. Force kill orphaned pinokiod scripts
+    log_to_file("[CLEANUP] Sweeping for orphaned pinokiod scripts...");
+    let output_pkill = std::process::Command::new("pkill")
+        .arg("-f")
+        .arg("pinokiod/script/index.js")
+        .output();
+        
+    match output_pkill {
+         Ok(o) => {
+             // pkill returns exit code 1 if nothing matched (which is good), so we don't assume only Success=true is good.
+             log_to_file(&format!("[CLEANUP] Orphan sweep complete. (Exit code: {:?})", o.status.code()));
+         },
+         Err(e) => {
+             log_to_file(&format!("[CLEANUP] Warning: Failed to sweep orphans: {}", e));
+         }
+    }
+}
+
 fn main() {
     log_to_file("----------------------------------------");
     log_to_file("Pinokio Starting...");
+
+    // Auto-Cleanup: Kill zombies before doing anything else
+    kill_zombies();
 
     // System tray menu
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -153,6 +193,12 @@ fn main() {
                 
                 let mut cmd = Command::new("node");
                 cmd.arg(&script_path);
+
+                // Performance Optimization (v5.3.11)
+                // 1. Increase threadpool for blocking I/O (Filesystem, Crypto, Zlib)
+                cmd.env("UV_THREADPOOL_SIZE", "128"); 
+                // 2. Allow more RAM for Node.js to reduce GC pauses (4GB)
+                cmd.env("NODE_OPTIONS", "--max-old-space-size=4096");
                 
                 // Fix for bundled environment: Set NODE_PATH to node_modules_vendor
                 if let Some(script_dir) = script_path_buf.parent() {
