@@ -7,7 +7,7 @@
     },
     "package": {
         "productName": "Pinokio",
-        "version": "5.3.8"
+        "version": "5.3.9"
     },
     "tauri": {
         "allowlist": {
