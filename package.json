@@ -1,7 +1,7 @@
 {
   "name": "pinokio",
   "private": true,
-  "version": "5.3.9",
+  "version": "5.3.10",
   "homepage": "https://pinokio.co",
   "description": "pinokio",
   "main": "main.js",
