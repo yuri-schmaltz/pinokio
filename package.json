@@ -1,7 +1,7 @@
 {
   "name": "pinokio",
   "private": true,
-  "version": "5.3.12",
+  "version": "5.3.13",
   "homepage": "https://pinokio.co",
   "description": "pinokio",
   "main": "main.js",
@@ -19,6 +19,7 @@
     "zip": "node script/zip",
     "monkeypatch": "cp temp/yarn.js node_modules/app-builder-lib/out/util/yarn.js && cp temp/rebuild.js node_modules/@electron/rebuild/lib/src/rebuild.js",
     "postinstall2": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps",
+    "postinstall": "node scripts/sync-vendor.js",
     "fix": "brew install fpm",
     "test": "npm run test:smoke",
     "test:smoke": "mocha \"test/smoke/**/*.test.js\"",
