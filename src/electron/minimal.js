@@ -2,7 +2,7 @@ const { app, Tray, Menu, shell, nativeImage, BrowserWindow, session, Notificatio
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('./test/support/pinokio-mock') : require("pinokiod")
+const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('../../test/support/pinokio-mock') : require("pinokiod")
 const config = require('./config')
 const Updater = require('./updater')
 const pinokiod = new PinokioImpl(config)
@@ -56,7 +56,7 @@ const getSplashIcon = () => {
     'icon2.png'
   ]
   for (const relative of candidates) {
-    const absolute = path.join(__dirname, relative)
+    const absolute = path.join(__dirname, '../..', relative)
     if (fs.existsSync(absolute)) {
       splashIcon = relative.split(path.sep).join('/')
       return splashIcon
@@ -81,7 +81,7 @@ const updateSplashWindow = ({ state = 'loading', message, detail, logPath, icon 
   if (icon) {
     query.icon = icon
   }
-  win.loadFile(path.join(__dirname, 'splash.html'), { query }).finally(() => {
+  win.loadFile(path.join(__dirname, '../../ui/splash.html'), { query }).finally(() => {
     if (!win.isDestroyed()) {
       win.show()
     }
@@ -188,7 +188,7 @@ app.whenReady().then(async () => {
   closeSplashWindow()
   rootUrl = `http://localhost:${pinokiod.port}`
   if (process.platform === 'darwin') app.dock.hide();
-  const assetsRoot = app.isPackaged ? process.resourcesPath : __dirname
+  const assetsRoot = app.isPackaged ? process.resourcesPath : path.join(__dirname, '../..')
   const iconPath = path.resolve(assetsRoot, "assets/icon_small.png")
   let icon = nativeImage.createFromPath(iconPath)
   icon = icon.resize({

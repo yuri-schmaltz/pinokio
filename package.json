@@ -4,7 +4,7 @@
   "version": "5.3.13",
   "homepage": "https://pinokio.co",
   "description": "pinokio",
-  "main": "main.js",
+  "main": "src/electron/main.js",
   "email": "cocktailpeanuts@proton.me",
   "author": "https://twitter.com/cocktailpeanut",
   "scripts": {
@@ -29,7 +29,7 @@
   },
   "build": {
     "appId": "computer.pinokio",
-    "afterPack": "after-pack.js",
+    "afterPack": "build/after-pack.js",
     "afterSign": "electron-builder-notarize",
     "directories": {
       "output": "dist-${platform}"

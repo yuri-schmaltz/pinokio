@@ -2,16 +2,16 @@ const { app, screen, shell, BrowserWindow, BrowserView, ipcMain, dialog, clipboa
 const windowStateKeeper = require('electron-window-state');
 const fs = require('fs')
 const path = require("path")
-const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('./test/support/pinokio-mock') : require("pinokiod")
+const PinokioImpl = process.env.PINOKIO_TEST_MODE === '1' ? require('../../test/support/pinokio-mock') : require("pinokiod")
 const os = require('os')
 const Updater = require('./updater')
 const is_mac = process.platform.startsWith("darwin")
 const platform = os.platform()
 const { HARDEN_RENDERER, ALLOWED_PERMISSIONS, buildWebPreferences } = require('./webprefs')
 const { installPermissionHandler, installCertificateErrorHandler } = require('./permissions')
-const { checkPort } = require('./script/heartbeat')
+const { checkPort } = require('../../scripts/heartbeat')
 // Modular lib imports (available for gradual migration)
-const lib = require('./lib')
+const lib = require('../../lib')
 var mainWindow;
 var root_url;
 var wins = {}
@@ -215,7 +215,7 @@ const getSplashIcon = () => {
     'icon2.png'
   ]
   for (const relative of candidates) {
-    const absolute = path.join(__dirname, relative)
+    const absolute = path.join(__dirname, '../..', relative)
     if (fs.existsSync(absolute)) {
       splashIcon = relative.split(path.sep).join('/')
       return splashIcon
@@ -263,7 +263,7 @@ const updateSplashWindow = ({ state = 'loading', message, detail, logPath, icon 
   if (icon) {
     query.icon = icon
   }
-  win.loadFile(path.join(__dirname, 'splash.html'), { query }).finally(() => {
+  win.loadFile(path.join(__dirname, '../../ui/splash.html'), { query }).finally(() => {
     if (!win.isDestroyed()) {
       win.show()
     }

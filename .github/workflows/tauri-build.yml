@@ -37,9 +37,8 @@ jobs:
 
       - name: prepare ui assets
         run: |
-          mkdir -p ui
-          cp splash.html prompt.html ui/
-          cp -r assets lib frontend ui/
+          # UI assets já estão consolidados em ui/, apenas copiar frontend se necessário
+          cp -r frontend ui/ 2>/dev/null || true
 
       - name: build tauri app
         uses: tauri-apps/tauri-action@v0
