@@ -9,6 +9,7 @@
   "author": "https://twitter.com/cocktailpeanut",
   "scripts": {
     "start": "electron .",
+    "dev": "npm start",
     "pack": "./node_modules/.bin/electron-builder --dir",
     "eject": "hdiutil info | grep '/dev/disk' | awk '{print $1}' | xargs -I {} hdiutil detach {}",
     "l": "docker run --rm -ti -v $PWD:/project -w /project -e SNAPCRAFT_BUILD_ENVIRONMENT=host -e SNAP_DESTRUCTIVE_MODE=true electronuserland/builder bash -lc 'rm -rf node_modules && npm install && npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps && ./node_modules/.bin/electron-builder -l'",
