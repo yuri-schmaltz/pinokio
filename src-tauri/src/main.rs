@@ -7,6 +7,8 @@
 )]
 
 mod commands;
+#[cfg(test)]
+mod tests;
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -86,6 +88,16 @@ fn main() {
     tauri::Builder::default()
         .manage(process_state)
         .system_tray(system_tray)
+        .on_window_event(|event| match event.event() {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                let window = event.window();
+                if window.label() == "main" {
+                    api.prevent_close();
+                    let _ = window.emit("close-requested", ());
+                }
+            }
+            _ => {}
+        })
         .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let handle = app.handle();
