@@ -15,10 +15,10 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -33,11 +33,11 @@ jobs:
 
       - name: create node_modules_vendor symlink
         run: |
-           rm -rf src-tauri/node_modules_vendor
+           rm -rf backend/tauri/node_modules_vendor
            # Install dependencies
            npm install
            # Symlink for bundling
-           ln -s $(pwd)/node_modules src-tauri/node_modules_vendor
+           ln -s $(pwd)/node_modules backend/tauri/node_modules_vendor
 
       - name: install frontend dependencies
         run: npm install
