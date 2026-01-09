@@ -60,3 +60,25 @@ Uma task é considerada pronta quando:
 ## 5. Governância
 - **Owner de Qualidade:** QA Senior / Tech Lead.
 - **Code Review:** QA deve aprovar PRs que tocam em áreas críticas ou alteram fluxos core.
+
+## 6. Quality Gates Visuais (Design System)
+
+Para garantir consistência visual e prevenir dívida técnica de UI:
+
+### 6.1. Regras para CSS/Estilo
+- ✅ **Obrigatório:** Todo estilo deve usar CSS Variables (`var(--...)`) para cores
+- ✅ **Obrigatório:** Tokens semânticos preferidos (ex: `--text-primary` > `--color-gray-900`)
+- ❌ **Proibido:** Hardcoded hex/rgb colors em novos componentes
+- ❌ **Proibido:** Uso de tokens deprecados (marked `@deprecated` em `style.css`)
+
+### 6.2. Checklist de Code Review (UI/CSS)
+Antes de aprovar PR com mudanças visuais:
+- [ ] Todas as cores referenciam CSS variables?
+- [ ] Componente segue padrões documentados em [`DESIGN_SYSTEM.md`](file:///home/yurix/.gemini/antigravity/brain/2e5bd48c-e7f2-4f3d-996e-daf4a5519aa0/DESIGN_SYSTEM.md)?
+- [ ] Dark mode testado manualmente?
+- [ ] Sem layout shift (imagens têm dimensões fixas)?
+- [ ] Acessibilidade: alt text, contraste, navegação por teclado?
+
+### 6.3. Referências
+- **Design System:** [`DESIGN_SYSTEM.md`](file:///home/yurix/.gemini/antigravity/brain/2e5bd48c-e7f2-4f3d-996e-daf4a5519aa0/DESIGN_SYSTEM.md)
+- **UX Audit:** [`UX_AUDIT.md`](file:///home/yurix/.gemini/antigravity/brain/2e5bd48c-e7f2-4f3d-996e-daf4a5519aa0/UX_AUDIT.md)
