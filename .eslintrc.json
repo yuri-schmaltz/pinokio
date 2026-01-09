@@ -35,7 +35,9 @@
     "ignorePatterns": [
         "node_modules/",
         "dist*/",
-        "temp/",
-        "test-results/"
+        "backend/tauri/target/",
+        "backend/node/",
+        "tests/",
+        "temp/"
     ]
 }

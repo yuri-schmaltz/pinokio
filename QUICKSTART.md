@@ -107,17 +107,20 @@ node start.js --help
 
 ```
 my-pinokio/
-├── src/electron/          # Código principal Electron
-│   ├── main.js           # Entry point
-│   ├── full.js           # Modo desktop completo
-│   └── minimal.js        # Modo minimalista
-├── build/                # Scripts de build e empacotamento
+├── backend/               # Código backend (centralizado)
+│   ├── src/electron/          # Código principal Electron
+│   │   ├── main.js           # Entry point
+│   │   ├── full.js           # Modo desktop completo
+│   │   └── minimal.js        # Modo minimalista
+│   ├── build/                # Scripts de build e empacotamento
+│   ├── lib/                  # Bibliotecas compartilhadas
+│   ├── scripts/              # Scripts utilitários
+│   ├── tauri/                # Build Tauri (alternativa)
+│   ├── vendor/               # Código do vendor
+│   └── node/                 # Pinokio backend
+├── ui/                   # Views HTML e assets consolidados
 ├── tests/                # Testes e configurações
 ├── docs/                 # Documentação
-├── ui/                   # Views HTML e assets consolidados
-├── lib/                  # Bibliotecas compartilhadas
-├── scripts/              # Scripts utilitários
-├── tauri/                # Build Tauri (alternativa)
 └── package.json          # Dependências e scripts
 ```
 
@@ -162,7 +165,7 @@ type setup.log             # Windows
 - Se persistir: `npm cache clean --force`
 
 ### Porta já em uso
-- **Solução:** Feche outros Pinokio ou mude a porta em `src/electron/config.js`
+- **Solução:** Feche outros Pinokio ou mude a porta em `backend/src/electron/config.js`
 
 ### Dependências não instaladas
 - **Solução:** Execute manualmente:

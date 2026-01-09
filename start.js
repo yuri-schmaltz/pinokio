@@ -288,9 +288,9 @@ async function validateSetup() {
 
   const validations = [
     { name: 'Electron', path: 'node_modules/electron' },
-    { name: 'Arquivo principal', path: 'src/electron/main.js' },
+    { name: 'Arquivo principal', path: 'backend/src/electron/main.js' },
     { name: 'Diretório UI', path: 'ui' },
-    { name: 'Diretório de scripts', path: 'scripts' },
+    { name: 'Diretório de scripts', path: 'backend/scripts' },
   ];
 
   let validationFailed = false;

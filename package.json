@@ -4,7 +4,7 @@
   "version": "5.3.13",
   "homepage": "https://pinokio.co",
   "description": "pinokio",
-  "main": "src/electron/main.js",
+  "main": "backend/src/electron/main.js",
   "email": "cocktailpeanuts@proton.me",
   "author": "https://twitter.com/cocktailpeanut",
   "scripts": {
@@ -18,19 +18,19 @@
     "dist": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps && export SNAPCRAFT_BUILD_ENVIRONMENT=host && export SNAP_DESTRUCTIVE_MODE='true' && ./node_modules/.bin/electron-builder -l && npm run zip",
     "dist2": "npm run monkeypatch && export USE_SYSTEM_FPM=true && ./node_modules/.bin/electron-builder install-app-deps && export SNAPCRAFT_BUILD_ENVIRONMENT=host && export SNAP_DESTRUCTIVE_MODE='true' && ./node_modules/.bin/electron-builder -mwl && npm run zip",
     "zip": "node script/zip",
-    "monkeypatch": "cp temp/yarn.js node_modules/app-builder-lib/out/util/yarn.js && cp temp/rebuild.js node_modules/@electron/rebuild/lib/src/rebuild.js",
+    "monkeypatch": "cp backend/temp/yarn.js node_modules/app-builder-lib/out/util/yarn.js && cp backend/temp/rebuild.js node_modules/@electron/rebuild/lib/src/rebuild.js",
     "postinstall2": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps",
-    "postinstall": "node scripts/sync-vendor.js",
+    "postinstall": "node backend/scripts/sync-vendor.js",
     "fix": "brew install fpm",
     "test": "npm run test:smoke",
     "test:smoke": "mocha \"test/smoke/**/*.test.js\"",
     "test:e2e": "playwright test",
-    "lint": "eslint *.js script/*.js test/**/*.js",
+    "lint": "eslint *.js backend/scripts/*.js tests/**/*.js",
     "bench": "node test/perf/benchmark.js"
   },
   "build": {
     "appId": "computer.pinokio",
-    "afterPack": "build/after-pack.js",
+    "afterPack": "backend/build/after-pack.js",
     "afterSign": "electron-builder-notarize",
     "directories": {
       "output": "dist-${platform}"
@@ -51,7 +51,7 @@
       "node_modules/toasted-notifier/vendor/mac.noindex/**/*"
     ],
     "nsis": {
-      "include": "build/installer.nsh"
+      "include": "backend/build/installer.nsh"
     },
     "extraResources": [
       "./script/**",
@@ -133,7 +133,7 @@
     "win": {
       "artifactName": "Pinokio.${ext}",
       "signtoolOptions": {
-        "sign": "./build/sign.js"
+        "sign": "./backend/build/sign.js"
       },
       "target": [
         {

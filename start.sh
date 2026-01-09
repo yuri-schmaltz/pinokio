@@ -266,11 +266,11 @@ validate_setup() {
     fi
     
     # Verificar se main.js existe
-    if [[ ! -f "src/electron/main.js" ]]; then
-        log_error "src/electron/main.js não encontrado"
+    if [[ ! -f "backend/src/electron/main.js" ]]; then
+        log_error "backend/src/electron/main.js não encontrado"
         validation_failed=true
     else
-        log_success "Arquivo principal encontrado: src/electron/main.js"
+        log_success "Arquivo principal encontrado: backend/src/electron/main.js"
     fi
     
     # Verificar se ui/ existe
