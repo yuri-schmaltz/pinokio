@@ -78,3 +78,64 @@ pub fn get_system_resources() -> Result<HashMap<String, f64>, String> {
     
     Ok(resources)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_process_info_serialization() {
+        let info = ProcessInfo {
+            pid: 1234,
+            name: "test_process".to_string(),
+            status: "running".to_string(),
+            cpu_usage: 1.5,
+            mem_usage: 1024,
+        };
+        let json = serde_json::to_string(&info).expect("Failed to serialize ProcessInfo");
+        assert!(json.contains("1234"));
+        assert!(json.contains("test_process"));
+        assert!(json.contains("running"));
+    }
+
+    #[test]
+    fn test_process_manager_thread_safety() {
+        let state = ProcessManagerState {
+            processes: Arc::new(Mutex::new(HashMap::new())),
+        };
+        
+        // Simulate thread sharing
+        let process_lock = state.processes.clone();
+        let handle = std::thread::spawn(move || {
+            let mut guard = process_lock.lock().unwrap();
+            guard.insert(1, ProcessInfo {
+                pid: 1,
+                name: "init".to_string(),
+                status: "sleeping".to_string(),
+                cpu_usage: 0.0,
+                mem_usage: 0,
+            });
+        });
+        
+        handle.join().unwrap();
+        
+        let guard = state.processes.lock().unwrap();
+        assert!(guard.contains_key(&1));
+    }
+
+    #[test]
+    fn test_detect_conda_smoke() {
+        // This test ensures the function doesn't panic regardless of the environment.
+        let result = detect_conda();
+        match result {
+            Ok(path) => {
+                println!("Allowed: Conda found at {}", path);
+                assert!(!path.is_empty());
+            },
+            Err(e) => {
+                println!("Allowed: Conda not found ({})", e);
+                assert!(!e.is_empty());
+            }
+        }
+    }
+}
