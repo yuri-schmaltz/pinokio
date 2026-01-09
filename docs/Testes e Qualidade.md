@@ -49,7 +49,7 @@ Uma task é considerada pronta quando:
 | **Lint** | `npm run lint` | Verifica estilo e erros estáticos. |
 | **Smoke** | `npm run test:smoke` | Testes rápidos de sanidade (Node). |
 | **E2E** | `npm run test:e2e` | Testes de interface completos (Playwright). |
-| **Rust** | `cd src-tauri && cargo test` | Testes unitários do backend Rust (Futuro). |
+| **Rust** | `cd backend/tauri && cargo test` | Testes unitários do backend Rust (Futuro). |
 
 ## 4. Métricas de Sucesso (KPIs)
 

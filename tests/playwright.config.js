@@ -3,7 +3,7 @@ const { defineConfig, devices } = require('@playwright/test');
 const path = require('path');
 
 module.exports = defineConfig({
-  testDir: './test/e2e',
+  testDir: './tests/e2e',
   timeout: 30000,
   retries: 0,
   use: {

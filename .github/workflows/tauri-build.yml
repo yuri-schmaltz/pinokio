@@ -52,4 +52,4 @@ jobs:
           prerelease: false
           includeDeb: true
           includeAppImage: true
-          projectPath: "./src-tauri"
+          projectPath: "./backend/tauri"

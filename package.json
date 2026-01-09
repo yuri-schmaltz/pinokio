@@ -17,16 +17,16 @@
     "build2": "npm run l && npm run mw",
     "dist": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps && export SNAPCRAFT_BUILD_ENVIRONMENT=host && export SNAP_DESTRUCTIVE_MODE='true' && ./node_modules/.bin/electron-builder -l && npm run zip",
     "dist2": "npm run monkeypatch && export USE_SYSTEM_FPM=true && ./node_modules/.bin/electron-builder install-app-deps && export SNAPCRAFT_BUILD_ENVIRONMENT=host && export SNAP_DESTRUCTIVE_MODE='true' && ./node_modules/.bin/electron-builder -mwl && npm run zip",
-    "zip": "node script/zip",
+    "zip": "node backend/scripts/zip.js",
     "monkeypatch": "cp backend/temp/yarn.js node_modules/app-builder-lib/out/util/yarn.js && cp backend/temp/rebuild.js node_modules/@electron/rebuild/lib/src/rebuild.js",
     "postinstall2": "npm run monkeypatch && ./node_modules/.bin/electron-builder install-app-deps",
     "postinstall": "node backend/scripts/sync-vendor.js",
     "fix": "brew install fpm",
     "test": "npm run test:smoke",
-    "test:smoke": "mocha \"test/smoke/**/*.test.js\"",
-    "test:e2e": "playwright test",
+    "test:smoke": "mocha \"tests/smoke/**/*.test.js\"",
+    "test:e2e": "playwright test -c tests/playwright.config.js",
     "lint": "eslint *.js backend/scripts/*.js tests/**/*.js",
-    "bench": "node test/perf/benchmark.js"
+    "bench": "node -e \"console.error('bench: não configurado neste repo'); process.exit(1)\""
   },
   "build": {
     "appId": "computer.pinokio",
@@ -54,7 +54,7 @@
       "include": "backend/build/installer.nsh"
     },
     "extraResources": [
-      "./script/**",
+      "./backend/scripts/**",
       {
         "from": "assets/icon_small.png",
         "to": "assets/icon_small.png"
