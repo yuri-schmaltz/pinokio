@@ -1,0 +1,179 @@
+<html>
+
+<head>
+  <title>Logs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link href="/xterm.min.css" rel="stylesheet" />
+  <link href="/css/fontawesome.min.css" rel="stylesheet">
+  <link href="/css/solid.min.css" rel="stylesheet">
+  <link href="/css/regular.min.css" rel="stylesheet">
+  <link href="/css/brands.min.css" rel="stylesheet">
+  <link href="/markdown.css" rel="stylesheet" />
+  <link href="/noty.css" rel="stylesheet" />
+  <link href="/style.css" rel="stylesheet" />
+  <% if (agent==="electron" ) { %>
+    <link href="/electron.css" rel="stylesheet" />
+    <% } %>
+      <script src="/window_storage.js"></script>
+      <script src="/popper.min.js"></script>
+      <script src="/tippy-bundle.umd.min.js"></script>
+      <script src="/hotkeys.min.js"></script>
+      <script src="/sweetalert2.js"></script>
+      <script src="/noty.js"></script>
+      <script src="/notyq.js"></script>
+      <script src="/xterm.js"></script>
+      <script src="/xterm-addon-fit.js"></script>
+      <script src="/xterm-addon-web-links.js"></script>
+      <script src="/xterm-theme.js"></script>
+      <script src="/install.js"></script>
+      <script src="/timeago.min.js"></script>
+      <script src="/common.js"></script>
+      <script src="/opener.js"></script>
+      <script src="/nav.js"></script>
+      <script src="/report.js"></script>
+</head>
+
+<body class='<%=theme%>' data-agent="<%=agent%>">
+  <header class='navheader grabbable'>
+    <h1>
+      <span class="sr-only">Logs</span>
+      <a class='home' href="/home" aria-label="Pinokio Home"><img class='icon' src="/pinokio-black.png"
+          alt="Pinokio"></a>
+      <button class='btn2' id='minimize-header' data-tippy-content="fullscreen" title='fullscreen'
+        aria-label="Toggle Fullscreen">
+        <div><i class="fa-solid fa-expand"></i></div>
+      </button>
+      <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
+        <div><i class="fa-solid fa-chevron-left"></i></div>
+      </button>
+      <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
+        <div><i class="fa-solid fa-chevron-right"></i></div>
+      </button>
+      <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
+        <div><i class="fa-solid fa-rotate-right"></i></div>
+      </button>
+      <button class='btn2' id='screenshot' data-tippy-content="screen capture" aria-label="Capture Screenshot"><i
+          class="fa-solid fa-camera"></i></button>
+      <button class='btn2' id='inspector' data-tippy-content="X-ray mode" aria-label="Inspect Element"><i
+          class="fa-solid fa-eye"></i></button>
+      <div class='mobile-flexible'></div>
+      <a class='btn2' href="/columns" data-tippy-content="split into 2 columns" aria-label="Split Columns">
+        <div><i class="fa-solid fa-table-columns"></i></div>
+      </a>
+      <a class='btn2' href="/rows" data-tippy-content="split into 2 rows" aria-label="Split Rows">
+        <div><i class="fa-solid fa-table-columns fa-rotate-270"></i></div>
+      </a>
+      <button class='btn2' id='new-window' data-tippy-content="open a new window" title='open a new window'
+        data-agent="<%=agent%>" aria-label="Open New Window">
+        <div><i class="fa-solid fa-plus"></i></div>
+      </button>
+      <button class='btn2 hidden' id='close-window' data-tippy-content='close this section' aria-label="Close Window">
+        <div><i class="fa-solid fa-xmark"></i></div>
+      </button>
+    </h1>
+  </header>
+  <main class="fade-in">
+    <div class='container'>
+      <% if (!logsError) { %>
+        <section class="logs-page" id="logs-root" data-workspace="<%= logsWorkspace ? logsWorkspace : '' %>">
+          <div class="logs-sidebar" aria-label="Log folders">
+            <div class="logs-sidebar-header">
+              <div>
+                <p class="logs-sidebar-eyebrow">Logs directory</p>
+                <h2>Logs</h2>
+                <% if (logsTitle) { %>
+                  <div class="logs-workspace-chip" title="<%= logsTitle %>">
+                    <i class="fa-solid fa-box"></i>
+                    <span>
+                      <%= logsTitle %>
+                    </span>
+                  </div>
+                  <% } %>
+              </div>
+              <div class="logs-root-path" title="<%= logsRootDisplay %>">
+                <i class="fa-solid fa-folder-tree"></i>
+                <span>
+                  <%= logsRootDisplay %>
+                </span>
+              </div>
+            </div>
+            <div class="logs-zip-actions">
+              <button type="button" class="logs-primary-button" id="logs-generate-archive">
+                <i class="fa-solid fa-file-zipper"></i>
+                <span>Generate a zip archive</span>
+              </button>
+              <a id="logs-download-archive" class="logs-secondary-button hidden"
+                href="<%= typeof logsDownloadUrl !== 'undefined' ? logsDownloadUrl : '/pinokio/logs.zip' %>" download>
+                <i class="fa-solid fa-download"></i>
+                <span>Download latest archive</span>
+              </a>
+              <div class="logs-zip-status" id="logs-zip-status" role="status" aria-live="polite"></div>
+            </div>
+            <div class="logs-tree-toolbar">
+              <button type="button" class="logs-flat-button" id="logs-refresh-tree">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Refresh tree</span>
+              </button>
+              <p class="logs-tree-hint">Streaming works for every file inside this folder.</p>
+            </div>
+            <div class="logs-tree-wrapper">
+              <div class="logs-tree" id="logs-tree" role="tree" aria-label="Pinokio logs"></div>
+            </div>
+          </div>
+          <div class="logs-resizer" id="logs-resizer" role="separator" aria-orientation="vertical" aria-valuemin="220"
+            aria-valuemax="560" aria-valuenow="320" tabindex="0" aria-label="Resize or collapse log navigation">
+            <button type="button" class="logs-resizer-toggle" aria-label="Collapse log navigation">
+              <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="logs-main" aria-live="polite">
+            <div class="logs-viewer-panel">
+              <div class="logs-viewer-header">
+                <div>
+                  <p class="logs-viewer-eyebrow">Live log viewer</p>
+                  <div class="logs-viewer-path" id="logs-viewer-path">Select a log file to start streaming.</div>
+                </div>
+                <div class="logs-viewer-controls">
+                  <label class="logs-autoscroll-toggle">
+                    <input type="checkbox" id="logs-autoscroll" checked>
+                    <span>Auto-scroll</span>
+                  </label>
+                  <button type="button" class="logs-flat-button" id="logs-clear-viewer" disabled>
+                    <i class="fa-solid fa-eraser"></i>
+                    <span>Clear</span>
+                  </button>
+                </div>
+              </div>
+              <div class="logs-viewer-status" id="logs-viewer-status">Waiting for selection…</div>
+              <pre class="logs-viewer-output" id="logs-viewer-output" role="log" aria-live="polite" tabindex="0"></pre>
+            </div>
+          </div>
+        </section>
+        <% } else { %>
+          <section class="logs-page logs-page--error" id="logs-root-error">
+            <div class="logs-empty-state">
+              <div class="logs-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <h2>Unable to open logs for this workspace</h2>
+              <p>
+                <%= logsError %>
+              </p>
+              <div class="logs-empty-actions">
+                <a class="btn" href="/logs"><i class="fa-solid fa-laptop-code"></i> View system logs</a>
+                <% if (logsWorkspace) { %>
+                  <a class="btn" href="/logs?workspace=<%= encodeURIComponent(logsWorkspace) %>"><i
+                      class="fa-solid fa-rotate-right"></i> Retry</a>
+                  <% } %>
+              </div>
+            </div>
+          </section>
+          <% } %>
+    </div>
+  </main>
+  <script>
+    window.LOGS_PAGE_DATA = <% - JSON.stringify({ rootDisplay: logsRootDisplay || '', downloadUrl: logsDownloadUrl || '/pinokio/logs.zip', workspace: logsWorkspace || '', workspaceTitle: logsTitle || '' }) %>
+  </script>
+  <script src="/logs.js"></script>
+</body>
+
+</html>
