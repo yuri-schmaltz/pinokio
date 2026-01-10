@@ -89,11 +89,10 @@ fn main() {
         .manage(process_state)
         .system_tray(system_tray)
         .on_window_event(|event| match event.event() {
-            tauri::WindowEvent::CloseRequested { api, .. } => {
+            tauri::WindowEvent::CloseRequested { .. } => {
                 let window = event.window();
                 if window.label() == "main" {
-                    api.prevent_close();
-                    let _ = window.emit("close-requested", ());
+                    std::process::exit(0);
                 }
             }
             _ => {}

@@ -50,33 +50,36 @@ async function run() {
         if (fs.existsSync(tauriDir)) {
             console.log('🔧 Preparing Tauri resources...');
 
-            // Ensure node_modules_vendor exists as a real directory
-            if (fs.existsSync(tauriVendorDir)) {
-                if (!fs.lstatSync(tauriVendorDir).isDirectory()) {
-                    fs.removeSync(tauriVendorDir);
-                }
-            }
             fs.ensureDirSync(tauriVendorDir);
 
-            // Prepare pinokiod into tauri resource folder
-            const pinokiodSource = path.join(rootDir, 'node_modules', 'pinokiod');
+            const pinokiodSource = path.join(rootDir, 'node_modules_vendor_cache', 'pinokiod'); // wait, where is the source? 
+            // Ah, the source is node_modules/pinokiod after step 1
+            const sourceOfTrue = path.join(rootDir, 'node_modules', 'pinokiod');
             const pinokiodTarget = path.join(tauriVendorDir, 'pinokiod');
 
-            if (fs.existsSync(pinokiodSource)) {
-                if (!fs.existsSync(pinokiodTarget)) {
-                    console.log('🔗 Linking pinokiod to Tauri resources (using hard links if possible)...');
-                    try {
-                        // Try hard link first for speed and space efficiency (Linux/macOS)
-                        require('child_process').execSync(`cp -al "${pinokiodSource}" "${pinokiodTarget}"`);
-                        console.log('✅ Hard linked pinokiod');
-                    } catch (e) {
-                        // Fallback to real copy if hard link fails (e.g. cross-device or Windows)
-                        console.log('⚠️ Hard link failed, falling back to copy (this may take a moment)...');
-                        fs.copySync(pinokiodSource, pinokiodTarget, { overwrite: true });
-                        console.log('✅ Copied pinokiod');
+            if (fs.existsSync(sourceOfTrue)) {
+                fs.ensureDirSync(pinokiodTarget);
+
+                // Always Force Sync UI components (Views/Public)
+                const uiDirs = ['server/views', 'server/public'];
+                for (const sub of uiDirs) {
+                    const src = path.join(sourceOfTrue, sub);
+                    const dest = path.join(pinokiodTarget, sub);
+                    if (fs.existsSync(src)) {
+                        fs.copySync(src, dest, { overwrite: true });
+                        console.log(`✅ Forced sync of ${sub} to Tauri`);
                     }
-                } else {
-                    console.log('✅ pinokiod resources already present');
+                }
+
+                // Sync the rest (script, etc.) only if missing to maintain speed
+                const coreDirs = ['script', 'server/routes', 'server/index.js'];
+                for (const sub of coreDirs) {
+                    const src = path.join(sourceOfTrue, sub);
+                    const dest = path.join(pinokiodTarget, sub);
+                    if (fs.existsSync(src) && !fs.existsSync(dest)) {
+                        fs.copySync(src, dest);
+                        console.log(`✅ Synced core ${sub} to Tauri`);
+                    }
                 }
             }
 

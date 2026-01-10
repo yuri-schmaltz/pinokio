@@ -548,46 +548,54 @@ body.dark .browser-options-row {
 <header class='grabbable'>
 -->
       <header class='navheader grabbable'>
-        <h1>
-          <% if (ishome) { %>
-            <!-- <a class='home' href="/home"><img class='icon' src="/pinokio-black.png"></a> -->
+        <h1 <% if (ishome) { %>class="home-header"<% } %>>
+            <span class="sr-only">
+              <%= ishome ? "Pinokio Home" : "Folder View" %>
+            </span>
+            <% if (ishome) { %>
+              <!-- <a class='home' href="/home"><img class='icon' src="/pinokio-black.png"></a> -->
 
-            <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
-              <div><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></div>
-            </button>
-            <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
-              <div><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
-            </button>
-            <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
-              <div><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></div>
-            </button>
+              <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
+                <div><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></div>
+              </button>
+              <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
+                <div><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+              </button>
+              <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
+                <div><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></div>
+              </button>
 
-            <button class='btn2 mobile-link-button' id='mobile-link-button' data-tippy-content="enter url"><i
-                class="fa-solid fa-link"></i></button>
-            <div class='mobile-flexible'></div>
-            <form class='urlbar'>
-              <div class='url-input-container'>
-                <input type='url' placeholder='enter any local url to open in pinokio'>
-                <div class='url-dropdown' id='url-dropdown'></div>
-              </div>
-            </form>
+              <button class='btn2 mobile-link-button' id='mobile-link-button' data-tippy-content="enter url"
+                aria-label="Enter URL"><i class="fa-solid fa-link"></i></button>
+              <div class='mobile-flexible'></div>
+              <form class='urlbar'>
+                <div class='url-input-container'>
+                  <input type='url' placeholder='enter any local url to open in pinokio'>
+                  <div class='url-dropdown' id='url-dropdown'></div>
+                </div>
+              </form>
 
-            <!-- <button class='btn2' id='new-window' data-tippy-content="open a new window" title='open a new window'
+              <!-- <button class='btn2' id='new-window' data-tippy-content="open a new window" title='open a new window'
               data-agent="<%=agent%>" aria-label="New Window">
               <div><i class="fa-solid fa-plus" aria-hidden="true"></i></div>
             </button> -->
-            <% } %>
-              <% paths.forEach((path)=> { %>
-                <% if (path.action) { %>
-                  <button type="button" class='path nav-button' id="<%=path.id%>"
-                    onclick="<%=path.action%>"><%-path.name%></button>
-                  <% } else if (path.path) { %>
-                    <a class='path' href="<%=path.path%>"><%-path.name%></a>
-                    <% } %>
-                      <% }) %>
-                        <button class='btn2 hidden' id='close-window' data-tippy-content='close this section'>
-                          <div><i class="fa-solid fa-xmark"></i></div>
-                        </button>
+              <% } %>
+
+                <%# UX-13: Hide duplicate header nav buttons on Home screen (they are already in the Hero section) %>
+                  <% if (!ishome) { %>
+                    <% paths.forEach((path)=> { %>
+                      <% if (path.action) { %>
+                        <button type="button" class='path nav-button' id="<%=path.id%>"
+                          onclick="<%=path.action%>"><%-path.name%></button>
+                        <% } else if (path.path) { %>
+                          <a class='path' href="<%=path.path%>"><%-path.name%></a>
+                          <% } %>
+                            <% }) %>
+                              <% } %>
+                                <button class='btn2 hidden' id='close-window' data-tippy-content='close this section'
+                                  aria-label="Close section">
+                                  <div><i class="fa-solid fa-xmark"></i></div>
+                                </button>
         </h1>
         <% if (!ishome) { %>
           <div class='runner'>
@@ -620,8 +628,8 @@ body.dark .browser-options-row {
               </div>
               <% } %>
       </header>
-      <main>
-        <div id='terminal' class='hidden'></div>
+      <main class="fade-in">
+        <div id='terminal' class='hidden pinokio-glass-terminal'></div>
         <div class='container'>
           <% if (ishome) { %>
             <form class='search'>
@@ -652,7 +660,7 @@ body.dark .browser-options-row {
                         data-description="<%=item.description%>" data-index="<%=item.index%>" data-name="<%=item.name%>"
                         data-title="<%=item.name%>" data-uri="<%=item.uri%>" data-icon="<%=item.icon%>"
                         data-path="<%=item.path%>" data-iconpath="<%=item.iconpath ? item.iconpath : ''%>"
-                        class='line align-top'>
+                        class='line align-top item-card-hover'>
                         <h3>
                           <div class='item-icon'>
                             <% if (item.icon) { %>
@@ -1538,7 +1546,7 @@ const pull = async () => {
 
               let disable_message = target.getAttribute('data-disable')
               if (disable_message && disable_message.length > 0) {
-                alert(disable_message)
+                await UI.alert(disable_message)
                 return
               }
 
@@ -1653,11 +1661,11 @@ const pull = async () => {
 
               let disable_message = target.getAttribute('data-disable')
               if (disable_message && disable_message.length > 0) {
-                alert(disable_message)
+                await UI.alert(disable_message)
                 return
               }
 
-              let confirmed = confirm("Are you sure you want to delete the folder? All files in the folder will be gone.")
+              let confirmed = await UI.confirm("Are you sure you want to delete the folder? All files in the folder will be gone.")
               if (confirmed) {
                 let itemEl = target.closest(".line[data-uri]")
                 let name = itemEl.getAttribute("data-uri")
@@ -1688,7 +1696,7 @@ const pull = async () => {
                   if (res.success) {
                     location.href = "/home"
                   } else if (res.error) {
-                    alert(res.error)
+                    await UI.error(res.error)
                   }
                 }
               } else {
@@ -1887,6 +1895,8 @@ if (document.querySelector("#wifi")) {
 
       </script>
       <script src="/opener.js"></script>
+      <script src="/sweetalert2.js"></script>
+      <script src="/ui_service.js"></script>
 </body>
 
 </html>

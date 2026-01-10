@@ -1,0 +1,1058 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href="/xterm.min.css" rel="stylesheet" />
+    <link href="/css/fontawesome.min.css" rel="stylesheet">
+    <link href="/css/solid.min.css" rel="stylesheet">
+    <link href="/css/regular.min.css" rel="stylesheet">
+    <link href="/css/brands.min.css" rel="stylesheet">
+    <link href="/markdown.css" rel="stylesheet" />
+    <link href="/noty.css" rel="stylesheet" />
+    <link href="/style.css" rel="stylesheet" />
+    <link href="/urldropdown.css" rel="stylesheet" />
+    <% if (agent==="electron" ) { %>
+        <link href="/electron.css" rel="stylesheet" />
+        <% } %>
+            <style>
+                .line2 {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    background: rgba(0, 0, 100, 0.04);
+                }
+
+                .line2 a {
+                    text-decoration: none;
+                    color: black;
+                }
+
+                .status {
+                    padding: 10px;
+                    margin: 10px;
+                    border-radius: 10px;
+                }
+
+                .status.offline {
+                    background: silver;
+                }
+
+                .status.online {
+                    background: yellowgreen;
+                }
+
+                .switch {
+                    padding: 10px;
+                    margin: 10px 0;
+                }
+
+                .switch[data-online=true] {
+                    color: yellowgreen;
+                }
+
+                .button {
+                    padding: 10px;
+                }
+
+                .on,
+                .off {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .items {
+                    max-width: 600px;
+                    margin: 50px auto;
+                }
+
+                body.dark .item {
+                    border-left: 5px solid rgba(255, 255, 255, 0.06);
+                }
+
+                .item {
+                    margin: 0;
+                    padding: 10px;
+                    border-left: 5px solid rgba(0, 0, 0, 0.06);
+                }
+
+                .titleview {
+                    margin: 0;
+                    padding: 25px;
+                    max-width: 600px;
+                }
+
+                .titleview h1 {
+                    word-break: break-word;
+                    font-size: 40px;
+                    margin-bottom: 20px;
+                    /* Increased margin */
+                }
+
+                .item>.d {
+                    padding-bottom: 10px;
+                }
+
+                .item label {
+                    display: block;
+                    text-transform: capitalize;
+                    font-size: 16px;
+                    /* Slightly smaller for refinement */
+                    font-weight: bold;
+                    padding-bottom: 8px;
+                    color: var(--text-secondary);
+                }
+
+                .item .explanation {
+                    padding-top: 5px;
+                    color: #bf411d;
+                    font-size: 12px;
+                }
+
+                body.dark .item .explanation {
+                    color: #ff8c6b;
+                }
+
+                /* Design System Standard Inputs */
+                .item input[type=text],
+                .item select {
+                    padding: 12px;
+                    border-radius: var(--radius-sm);
+                    border: 1px solid var(--border-default);
+                    background: var(--surface-2);
+                    color: var(--text-primary);
+                    width: 100%;
+                    box-sizing: border-box;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                }
+
+                .item input[type=text]:focus,
+                .item select:focus {
+                    outline: none;
+                    border-color: var(--color-primary-light);
+                    box-shadow: 0 0 0 2px rgba(127, 91, 243, 0.2);
+                }
+
+                .item img {
+                    width: 100px;
+                }
+
+                .item .title {
+                    text-decoration: none;
+                    color: var(--color-primary-light);
+                }
+
+                .item .col {
+                    padding: 10px;
+                }
+
+                .item .col>* {
+                    margin: 5px 0;
+                }
+
+                .item .stat {
+                    color: var(--text-secondary);
+                    display: flex;
+                }
+
+                .item .stat>* {
+                    margin-right: 15px;
+                }
+
+                .timestamp {
+                    color: var(--text-muted);
+                }
+
+                .home-warning {
+                    margin-top: 8px;
+                    padding: 10px 12px;
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                    border-radius: 6px;
+                    font-size: 12px;
+                    line-height: 1.4;
+                    background: rgba(255, 165, 0, 0.1);
+                }
+
+                body.dark .home-warning {
+                    border-color: rgba(255, 255, 255, 0.12);
+                    background: rgba(255, 165, 0, 0.05);
+                    color: rgba(255, 255, 255, 0.8);
+                }
+
+                .home-warning ul {
+                    margin: 0;
+                    padding-left: 18px;
+                }
+
+                .swal2-popup.custom-home-modal {
+                    border-radius: 10px;
+                    padding: 18px 18px 14px 18px;
+                    background: #fdfdfd;
+                    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+                    text-align: left;
+                }
+
+                body.dark .swal2-popup.custom-home-modal {
+                    background: #1f1f25;
+                    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
+                }
+
+                .swal2-popup.custom-home-modal .swal2-title {
+                    text-align: left !important;
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #111;
+                    margin: 0 0 6px 0;
+                    text-align: left;
+                }
+
+                body.dark .swal2-popup.custom-home-modal .swal2-title {
+                    color: #f5f5f5;
+                }
+
+                .swal2-popup.custom-home-modal .swal2-html-container {
+                    font-size: 14px;
+                    color: #333;
+                    margin: 0 0 10px 0;
+                    text-align: left;
+                }
+
+                body.dark .swal2-popup.custom-home-modal .swal2-html-container {
+                    color: rgba(255, 255, 255, 0.8);
+                }
+
+                .swal2-popup.custom-home-modal .swal2-actions {
+                    margin-top: 4px;
+                    gap: 8px;
+                    justify-content: flex-end !important;
+                }
+
+                .swal2-popup.custom-home-modal .swal2-styled.swal2-confirm {
+                    background: #4a4ae0;
+                    color: #fff;
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                    font-weight: 600;
+                }
+
+                .swal2-popup.custom-home-modal .swal2-styled.swal2-cancel {
+                    background: transparent;
+                    color: #555;
+                    border: 1px solid rgba(0, 0, 0, 0.15);
+                    border-radius: 6px;
+                    padding: 8px 16px;
+                }
+
+                body.dark .swal2-popup.custom-home-modal .swal2-styled.swal2-cancel {
+                    color: rgba(255, 255, 255, 0.8);
+                    border-color: rgba(255, 255, 255, 0.2);
+                }
+
+                body.dark .loading {
+                    background: rgba(255, 255, 255, 0.06);
+                }
+
+                .loading {
+                    padding: 20px;
+                    text-align: center;
+                    background: rgba(0, 0, 0, 0.06);
+                }
+
+                body.dark .btn {
+                    color: white;
+                    background: rgba(255, 255, 255, 0.1);
+                }
+
+                header .home {
+                    color: var(--light-color);
+                }
+
+                body.dark hr {
+                    background: white;
+                }
+
+                hr {
+                    opacity: 0.1;
+                    background: var(--border-default);
+                    margin: 30px 0;
+                    height: 1px;
+                    border: none;
+                }
+
+                .reset-cache-loading,
+                .reset-bin-loading,
+                .reset-env-loading,
+                .reset-browser-cache-loading {
+                    padding: 10px;
+                    background: rgba(0, 0, 0, 0.05);
+                    margin-bottom: 10px;
+                    text-align: center;
+                    border-radius: var(--radius-sm);
+                }
+
+                #proxy {
+                    text-decoration: underline;
+                    margin-left: 10px;
+                    display: inline-block;
+                    cursor: pointer;
+                    color: var(--color-primary-light);
+                    font-size: 14px;
+                }
+
+                body.dark .keys pre {
+                    background: rgba(0, 0, 0, 0.3) !important;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+
+                .keys pre {
+                    padding: 20px;
+                    margin: 20px 0;
+                    background: rgba(0, 0, 100, 0.02) !important;
+                    border-radius: var(--radius-sm);
+                    font-size: 13px;
+                    line-height: 1.5;
+                }
+
+                .swal2-actions {
+                    justify-content: center !important;
+                }
+
+                .swal2-title {
+                    text-align: center !important;
+                }
+
+                main {
+                    display: flex;
+                }
+
+                aside {
+                    width: 200px;
+                    display: block;
+                    flex-shrink: 0;
+                }
+
+                aside .tab i {
+                    width: 20px;
+                    text-align: center;
+                }
+
+                body.dark aside .tab {
+                    color: white;
+                }
+
+                body.dark aside .tab:hover,
+                aside .tab:hover {
+                    color: var(--color-primary-light) !important;
+                    opacity: 1;
+                }
+
+                aside .tab {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    color: var(--text-primary);
+                    text-decoration: none;
+                    padding: 10px;
+                    font-size: 13px;
+                    opacity: 0.6;
+                    border-left: 10px solid transparent;
+                    transition: opacity 0.2s, color 0.2s;
+                }
+
+                body.dark aside .tab.selected {
+                    color: white;
+                }
+
+                aside .selected {
+                    font-weight: bold;
+                    opacity: 1;
+                    border-left-color: var(--color-primary-light);
+                }
+
+                /* Red Button Style */
+                .btn.red {
+                    background: #ff4d4d;
+                    color: white;
+                }
+
+                body.dark .btn.red {
+                    background: #d32f2f;
+                }
+
+                @media only screen and (max-width: 600px) {
+                    aside {
+                        width: unset;
+                        flex-shrink: unset;
+                        padding: 0 10px;
+                    }
+
+                    aside .tab.submenu {
+                        padding: 10px;
+                    }
+
+                    aside .tab i {
+                        width: 100%;
+                    }
+
+                    aside .tab .caption {
+                        display: none;
+                    }
+
+                    aside .tab {
+                        margin: 0;
+                        padding: 10px;
+                        border-left: none;
+                    }
+
+                    aside .btn-tab {
+                        flex-direction: column;
+                        padding: 10px 0;
+                    }
+
+                    aside .btn-tab .btn {
+                        display: flex;
+                        justify-content: center;
+                    }
+
+                    aside .btn-tab .btn .caption {
+                        display: none;
+                    }
+
+                    header .flexible {
+                        min-width: unset;
+                    }
+                }
+
+                @media only screen and (max-width: 480px) {
+                    .btn2 {
+                        padding: 5px;
+                        font-size: 11px;
+                    }
+                }
+
+                /* Settings Glassmorphism */
+                .settings-container {
+                    margin: 20px;
+                    padding: 20px;
+                    border-radius: var(--radius-lg);
+                    background: var(--surface-1);
+                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    border: 1px solid rgba(0, 0, 0, 0.05);
+                }
+
+                body.dark .settings-container {
+                    background: rgba(0, 0, 0, 0.3);
+                    border-color: rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+                }
+            </style>
+            <script src="/window_storage.js"></script>
+            <script src="/popper.min.js"></script>
+            <script src="/tippy-bundle.umd.min.js"></script>
+            <script src="/hotkeys.min.js"></script>
+            <script src="/sweetalert2.js"></script>
+            <script src="/noty.js"></script>
+            <script src="/notyq.js"></script>
+            <script src="/Socket.js"></script>
+            <script src="/xterm.js"></script>
+            <script src="/xterm-addon-fit.js"></script>
+            <script src="/xterm-addon-web-links.js"></script>
+            <script src="/xterm-theme.js"></script>
+            <script src="/install.js"></script>
+            <script src="/timeago.min.js"></script>
+            <script src="/common.js"></script>
+            <script src="/opener.js"></script>
+            <script src="/nav.js"></script>
+            <script src="/ui_service.js"></script>
+            <script src="/urldropdown.js"></script>
+            <script>
+                // Initialize URL Dropdown with empty behavior for settings page
+                document.addEventListener('DOMContentLoaded', function () {
+                    initUrlDropdown({
+                        clearBehavior: 'empty'
+                    });
+                });
+            </script>
+            <script src="/report.js"></script>
+</head>
+
+<body class='<%=theme%>' data-agent="<%=agent%>">
+    <header class='navheader grabbable'>
+        <h1>
+            <span class="sr-only">Pinokio Settings</span>
+            <a class='home' href="/home" aria-label="Go home"><img class='icon' src="/pinokio-black.png"></a>
+            <button class='btn2' id='minimize-header' data-tippy-content="fullscreen" title='fullscreen'
+                aria-label="Toggle Fullscreen">
+                <div><i class="fa-solid fa-expand"></i></div>
+            </button>
+            <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
+                <div><i class="fa-solid fa-chevron-left"></i></div>
+            </button>
+            <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
+                <div><i class="fa-solid fa-chevron-right"></i></div>
+            </button>
+            <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
+                <div><i class="fa-solid fa-rotate-right"></i></div>
+            </button>
+            <% paths.forEach((path)=> { %>
+                <% if (path.action) { %>
+                    <button type="button" class='path nav-button' id="<%=path.id%>"
+                        onclick="<%=path.action%>"><%-path.name%></button>
+                    <% } else if (path.path) { %>
+                        <a class='path' href="<%=path.path%>"><%-path.name%></a>
+                        <% } %>
+                            <% }) %>
+                                <button class='btn2' id='screenshot' data-tippy-content="screen capture"
+                                    aria-label="Screenshot"><i class="fa-solid fa-camera"></i></button>
+                                <button class='btn2' id='inspector' data-tippy-content="X-ray mode"
+                                    aria-label="Inspector"><i class="fa-solid fa-eye"></i></button>
+                                <button class='btn2 mobile-link-button' id='mobile-link-button'
+                                    data-tippy-content="enter url" aria-label="Enter URL"><i
+                                        class="fa-solid fa-link"></i></button>
+                                <div class='mobile-flexible'></div>
+                                <form class='urlbar'>
+                                    <div class='url-input-container'>
+                                        <input type='url' placeholder='enter any local url to open in pinokio'
+                                            aria-label="Direct URL">
+                                        <div class='url-dropdown' id='url-dropdown'></div>
+                                    </div>
+                                </form>
+                                <a class='btn2' href="/columns" data-tippy-content="split into 2 columns"
+                                    aria-label="Split Columns">
+                                    <div><i class="fa-solid fa-table-columns"></i></div>
+                                </a>
+                                <a class='btn2' href="/rows" data-tippy-content="split into 2 rows"
+                                    aria-label="Split Rows">
+                                    <div><i class="fa-solid fa-table-columns fa-rotate-270"></i></div>
+                                </a>
+                                <button class='btn2' id='new-window' data-tippy-content="open a new window"
+                                    title='open a new window' data-agent="<%=agent%>" aria-label="New Window">
+                                    <div><i class="fa-solid fa-plus"></i></div>
+                                </button>
+                                <button class='btn2 hidden' id='close-window' data-tippy-content='close this section'
+                                    aria-label="Close Section">
+                                    <div><i class="fa-solid fa-xmark"></i></div>
+                                </button>
+        </h1>
+    </header>
+    <main>
+        <div class='container settings-container'>
+            <div class='titleview'>
+                <h1>Settings</h1>
+                <div>
+                    <div class='item'>
+                        <label>Version</label>
+                        <% if (version.pinokio) { %>
+                            <div>
+                                <%=version.pinokio%> <span class='timestamp'>(server: <%=version.pinokiod%>)</span>
+                            </div>
+                            <% } else { %>
+                                <div><span class='timestamp'>(server: <%=version.pinokiod%>)</span></div>
+                                <% } %>
+                    </div>
+                </div>
+                <form id="settings-form">
+                    <% config.forEach((c)=> { %>
+                        <div class='item <%=c.show_on_click ? "hidden" : ""%>' <%=c.show_on_click ? "data-onclick=" +
+                            c.show_on_click : "" %>>
+                            <label>
+                                <%=c.key%>
+                            </label>
+                            <% if (c.options) { %>
+                                <select name="<%=c.key%>" aria-label="<%=c.key%>">
+                                    <% c.options.forEach((o)=> { %>
+                                        <% if (o===c.val) { %>
+                                            <option value="<%=o%>" selected>
+                                                <%=o%>
+                                            </option>
+                                            <% } else { %>
+                                                <option value="<%=o%>">
+                                                    <%=o%>
+                                                </option>
+                                                <% } %>
+                                                    <% }) %>
+                                </select>
+                                <% } else { %>
+                                    <% if (c.val) { %>
+                                        <input class='homepath' name="<%=c.key%>" type='text' value="<%=c.val%>"
+                                            placeholder="<%=c.placeholder ? c.placeholder : ''%>"
+                                            data-first-home="<%= c.key === 'home' && !hasHome ? 'true' : 'false'%>"
+                                            aria-label="<%=c.key%>">
+                                        <% } else { %>
+                                            <input class='homepath' name="<%=c.key%>" type='text'
+                                                placeholder="<%=c.placeholder ? c.placeholder : ''%>"
+                                                data-first-home="<%=c.key === 'home' && !hasHome ? 'true' : 'false'%>"
+                                                aria-label="<%=c.key%>">
+                                            <% } %>
+                                                <% } %>
+                                                    <% if (c.description) { %>
+                                                        <% if (Array.isArray(c.description)) { %>
+                                                            <% c.description.forEach((d)=> { %>
+                                                                <div class='explanation'>
+                                                                    <%=d%>
+                                                                </div>
+                                                                <% }) %>
+                                                                    <% } else { %>
+                                                                        <div class='explanation'>
+                                                                            <%=c.description%>
+                                                                        </div>
+                                                                        <% } %>
+                                                                            <% } %>
+                        </div>
+                        <% }) %>
+                            <div class='item'>
+                                <button id='save' class='btn disabled'>Save</button>
+                                <a id='proxy'>Running behind proxy?</a>
+                            </div>
+                </form>
+                <div class='loading hidden'>
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Stand by. Do not close this window..
+                </div>
+                <% if (locals.bin) { %>
+                    <hr />
+                    <div id='troubleshoot' class='troubleshoot'>
+                        <h1>Troubleshoot</h1>
+                        <div class='item'>
+                            <label>bin</label>
+                            <div class='d'>Reset the bin folder and start fresh from scratch</div>
+                            <div class='reset-bin-loading hidden'>
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Stand by. Do not close this window..
+                            </div>
+                            <div>
+                                <button class='btn' data-filepath="<%=bin%>"><i
+                                        class="fa-solid fa-up-right-from-square"></i> View Folder</button>
+                                <button class='red btn' id='del-bin'><i class="fa-solid fa-trash-can"></i>
+                                    Reset</button>
+                            </div>
+                        </div>
+                        <div class='item'>
+                            <label>server cache</label>
+                            <div class='d'>Reset the pinokio server cache folder and start fresh from scratch</div>
+                            <div class='reset-cache-loading hidden'>
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Stand by. Do not close this window..
+                            </div>
+                            <div>
+                                <button class='btn' data-filepath="<%=cache%>"><i
+                                        class="fa-solid fa-up-right-from-square"></i> View Folder</button>
+                                <button class='red btn' id='del-cache'><i class="fa-solid fa-trash-can"></i>
+                                    Reset</button>
+                            </div>
+                        </div>
+                        <div class='item'>
+                            <label>environment variables</label>
+                            <div class='d'>Reset the pinokio environment variables and start fresh from scratch (Resets
+                                the ~/pinokio/ENVIRONMENT file)</div>
+                            <div class='reset-env-loading hidden'>
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Stand by. Do not close this window..
+                            </div>
+                            <div>
+                                <button class='btn' data-filepath="<%=env%>"><i
+                                        class="fa-solid fa-up-right-from-square"></i> View ENVIRONMENT file</button>
+                                <button class='red btn' id='del-env'><i class="fa-solid fa-trash-can"></i>
+                                    Reset</button>
+                            </div>
+                        </div>
+                        <% if (agent==="electron" ) { %>
+                            <div class='item'>
+                                <label>browser cache</label>
+                                <div class='d'>Reset the pinokio browser cache</div>
+                                <div class='reset-browser-cache-loading hidden'>
+                                    <i class="fa-solid fa-circle-notch fa-spin"></i> Stand by. Do not close this
+                                    window..
+                                </div>
+                                <div>
+                                    <button class='red btn' id='del-browser-cache'><i class="fa-solid fa-trash-can"></i>
+                                        Reset Browser Cache</button>
+                                </div>
+                            </div>
+                            <% } %>
+                                <div class='item'>
+                                    <label>drive</label>
+                                    <div class='d'>Shared virtual drives</div>
+                                    <div>
+                                        <button class='btn' data-filepath="<%=drive%>"><i
+                                                class="fa-solid fa-up-right-from-square"></i> View Folder</button>
+                                    </div>
+                                </div>
+                    </div>
+                    <hr />
+                    <div class='keys'>
+                        <h1>Keys</h1>
+                        <div class='item'>
+                            <div>Keys are array values stored for unique host names, stored at
+                                <code>~/pinokio/key.json</code>, and can be set through <code>pre</code> attributes in
+                                pinokio scripts. Here's an example:</div>
+                            <pre>{
+  "openai.com": [
+    "12345678-FAKEaccesstoken1234567890abcdef"
+  ],
+  "x.com": [
+    "12345678-FAKEaccesstoken1234567890abcdef",
+    "FAKEaccesstokensecret0987654321abcdef"
+  ]
+}</pre>
+                            <a class='btn' href="/keys"><i class="fa-solid fa-key"></i> Edit Keys</a>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class='advanced'>
+                        <h1>Advanced Settings</h1>
+                        <div class='item'>
+                            <div>Edit the system ENVIRONMENT file to customize pinokio system wide settings, such as
+                                where files are stored, terminal behavior, etc.</div>
+                            <br>
+                            <a class='btn' href="/env"><i class="fa-regular fa-pen-to-square"></i> Edit ENVIRONMENT</a>
+                        </div>
+                    </div>
+                    <hr />
+                    <% } %>
+            </div>
+        </div>
+        <aside>
+            <div class='btn-tab'>
+                <button type='button' class='btn' id='create-launcher-button'><i class="fa-solid fa-plus"></i>
+                    <div class='caption'>Create</div>
+                </button>
+                <a class='btn' id='explore' href="/home?mode=explore"><i class="fa-solid fa-globe"></i>
+                    <div class='caption'>Discover</div>
+                </a>
+            </div>
+            <a href="/home" class='tab'><i class='fas fa-laptop-code'></i>
+                <div class='caption'>This machine</div>
+            </a>
+            <a href="/network" class='tab'><i class="fa-solid fa-wifi"></i>
+                <div class='caption'>Local network</div>
+            </a>
+            <% if (list.length> 0) { %>
+                <% let brands={ win32: "windows" , darwin: "apple" , linux: "Linux" } %>
+                    <% list.forEach(({ host, name, platform, processes }, index)=> { %>
+                        <a href="/net/<%=name%>" class='submenu tab'><i class="fa-brands fa-<%=brands[platform]%>"></i>
+                            <div class='caption'>
+                                <%=name%> (<%=current_host===host ? 'this machine' : host%>)
+                            </div>
+                        </a>
+                        <% }) %>
+                            <% } %>
+                                <a href="/connect" class='tab'><i class="fa-solid fa-plug"></i>
+                                    <div class='caption'>Login</div>
+                                </a>
+                                <a class='tab' href="<%=portal%>" target="_blank"><i class="fa-solid fa-question"></i>
+                                    <div class='caption'>Help</div>
+                                </a>
+                                <a class='tab' id='genlog' href="/logs"><i class="fa-solid fa-laptop-code"></i>
+                                    <div class='caption'>Logs</div>
+                                </a>
+                                <a class='tab' href="/checkpoints"><i class="fa-solid fa-clock-rotate-left"></i>
+                                    <div class='caption'>Checkpoints</div>
+                                </a>
+                                <a class='tab' href="/screenshots"><i class="fa-solid fa-camera"></i>
+                                    <div class='caption'>Screenshots</div>
+                                </a>
+                                <a class='tab' href="/tools"><i class="fa-solid fa-toolbox"></i>
+                                    <div class='caption'>Installed Tools</div>
+                                </a>
+                                <a class='tab' href="/agents"><i class="fa-solid fa-robot"></i>
+                                    <div class='caption'>Agents</div>
+                                </a>
+                                <a class='tab selected' href="/home?mode=settings"><i class="fa-solid fa-gear"></i>
+                                    <div class='caption'>Settings</div>
+                                </a>
+                                <%- include('partials/peer_access_points', { peer_access_points, peer_url, peer_qr }) %>
+        </aside>
+    </main>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            //Reporter()
+            const n = new N()
+            const homeInput = document.querySelector('input.homepath[name="home"]')
+            let showHomeWarning = () => { }
+            const originalHome = homeInput ? (homeInput.defaultValue || '') : ''
+            const isFirstHome = homeInput ? homeInput.dataset.firstHome === 'true' : false
+            if (homeInput) {
+                const warning = document.createElement('div')
+                warning.className = 'home-warning hidden'
+                warning.innerHTML = `
+      <ul>
+        <li>Avoid exFAT; it can cause permission/metadata issues.</li>
+        <li>Avoid spaces in the path; they can break tooling.</li>
+      </ul>
+    `
+                const parent = homeInput.parentElement
+                if (parent) {
+                    parent.appendChild(warning)
+                }
+                const revealWarning = () => warning.classList.remove('hidden')
+                showHomeWarning = revealWarning
+                homeInput.addEventListener('focus', revealWarning)
+                homeInput.addEventListener('input', revealWarning)
+                homeInput.addEventListener('click', revealWarning)
+            }
+            const updateThemeClassAcrossShells = (nextTheme) => {
+                if (!nextTheme) {
+                    return
+                }
+                const applyTheme = (doc) => {
+                    if (!doc || !doc.body) {
+                        return
+                    }
+                    doc.body.classList.remove('dark', 'light')
+                    doc.body.classList.add(nextTheme)
+                }
+                let ctx = window
+                const visited = new Set()
+                while (ctx && !visited.has(ctx)) {
+                    visited.add(ctx)
+                    try {
+                        applyTheme(ctx.document)
+                    } catch (err) {
+                        break
+                    }
+                    try {
+                        if (!ctx.parent || ctx.parent === ctx) {
+                            break
+                        }
+                        ctx = ctx.parent
+                    } catch (err) {
+                        break
+                    }
+                }
+            }
+  <% if (locals.bin) { %>
+                document.querySelector("#del-bin").addEventListener("click", async (e) => {
+                    console.log("del-bin")
+                    let proceed = await UI.confirm("Are you sure you wish to delete the bin folder?")
+                    if (proceed) {
+                        document.querySelector(".reset-bin-loading").classList.remove("hidden")
+                        document.querySelector("#del-bin").classList.add("hidden")
+                        let res = await fetch("/pinokio/delete", {
+                            method: "post",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ type: "bin" })
+                        }).then((res) => {
+                            return res.json()
+                        })
+                        console.log(res)
+                        document.querySelector(".reset-bin-loading").classList.add("hidden")
+                        if (res.error) {
+                            await UI.error(res.error)
+                            document.querySelector("#del-bin").classList.remove("hidden")
+                        } else {
+                            location.href = location.href
+                        }
+                    }
+                })
+                document.querySelector("#del-cache").addEventListener("click", async (e) => {
+                    console.log("del-cache")
+                    let proceed = await UI.confirm("Are you sure you wish to delete the cache folder?")
+                    if (proceed) {
+                        document.querySelector(".reset-cache-loading").classList.remove("hidden")
+                        document.querySelector("#del-cache").classList.add("hidden")
+                        let res = await fetch("/pinokio/delete", {
+                            method: "post",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ type: "cache" })
+                        }).then((res) => {
+                            return res.json()
+                        })
+                        console.log(res)
+                        document.querySelector(".reset-cache-loading").classList.add("hidden")
+                        if (res.error) {
+                            await UI.error(res.error)
+                            document.querySelector("#del-cache").classList.remove("hidden")
+                        } else {
+                            location.href = location.href
+                        }
+                    }
+                })
+                document.querySelector("#del-env").addEventListener("click", async (e) => {
+                    console.log("del-env")
+                    let proceed = await UI.confirm("Are you sure you wish to reset the environment variables?")
+                    if (proceed) {
+                        document.querySelector(".reset-env-loading").classList.remove("hidden")
+                        document.querySelector("#del-env").classList.add("hidden")
+                        let res = await fetch("/pinokio/delete", {
+                            method: "post",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ type: "env" })
+                        }).then((res) => {
+                            return res.json()
+                        })
+                        console.log(res)
+                        document.querySelector(".reset-env-loading").classList.add("hidden")
+                        if (res.error) {
+                            await UI.error(res.error)
+                            document.querySelector("#del-env").classList.remove("hidden")
+                        } else {
+                            location.href = location.href
+                        }
+                    }
+                })
+                    <% } %>
+  <% if (agent === "electron") { %>
+    if (document.querySelector("#del-browser-cache")) {
+                    document.querySelector("#del-browser-cache").addEventListener("click", async (e) => {
+                        console.log("del-browser-cache")
+                        let proceed = await UI.confirm("Are you sure you wish to delete the browser cache? This will remove all cookies and site data")
+                        if (proceed) {
+                            document.querySelector(".reset-browser-cache-loading").classList.remove("hidden")
+                            document.querySelector("#del-browser-cache").classList.add("hidden")
+                            let res = await fetch("/pinokio/delete", {
+                                method: "post",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ type: "browser-cache" })
+                            }).then((res) => {
+                                return res.json()
+                            })
+                            console.log(res)
+                            document.querySelector(".reset-browser-cache-loading").classList.add("hidden")
+                            if (res.error) {
+                                await UI.error(res.error)
+                                document.querySelector("#del-browser-cache").classList.remove("hidden")
+                            } else {
+                                location.href = location.href
+                            }
+                        }
+                    })
+                }
+  <% } %>
+                document.querySelector("#proxy").addEventListener("click", (e) => {
+                    document.querySelectorAll("[data-onclick='#proxy']").forEach((el) => {
+                        el.classList.remove("hidden")
+                    })
+                })
+            document.querySelector("main form").addEventListener("submit", async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                showHomeWarning()
+                let val = document.querySelector(`[name=home]`).value
+                if (/.*\s+.*/.test(val)) {
+                    await UI.error("Please use a home path that does NOT include a space")
+                    document.querySelector("[name=home]").focus()
+                    return
+                }
+                if (val.length === 0) {
+                    await UI.error("Please set the home path")
+                    document.querySelector("[name=home]").focus()
+                    return
+                }
+                const isChanged = val !== originalHome
+                if (homeInput && (isFirstHome || isChanged)) {
+                    const confirmResult = await Swal.fire({
+                        title: 'Reminder',
+                        html: 'exFAT drives often break permissions/metadata.<br>Please double-check the path isn\u2019t on exFAT. If it looks good, click \u201cSelect\u201d to continue.',
+                        showCancelButton: true,
+                        confirmButtonText: 'Select',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        customClass: {
+                            popup: 'custom-home-modal'
+                        }
+                    })
+                    if (!confirmResult.isConfirmed) {
+                        return
+                    }
+                }
+
+
+                document.querySelector(".loading").classList.remove("hidden")
+                document.querySelector("#save").classList.add("hidden")
+                document.querySelector("[name=home]").setAttribute("disabled", "disabled")
+
+
+                let body = {}
+                let els = document.querySelectorAll(".item [name]")
+                for (let el of els) {
+                    let name = el.getAttribute("name")
+                    body[name] = el.value
+                }
+
+                console.log("body", body)
+
+
+                let r = await fetch("/config", {
+                    method: "post",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                }).then((res) => {
+                    return res.json()
+                })
+                if (r.success) {
+                    updateThemeClassAcrossShells(body.theme)
+                    if (r.message) {
+                        Swal.fire({
+                            title: r.message.title,
+                            text: r.message.text,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false,
+                            confirmButtonText: "Restart",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch("/onrestart", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({})
+                                }).then((res) => {
+                                    return res.json()
+                                })
+                                setInterval(async () => {
+                                    try {
+                                        let res = await fetch("/check").then((res) => {
+                                            return res.json()
+                                        })
+                                        if (res.success) {
+                                            document.querySelector(".loading").classList.add("hidden")
+                                            setTimeout(() => {
+                                                location.href = "/home"
+                                            }, 1000)
+                                        }
+                                    } catch (e) {
+                                        console.log(e)
+                                    }
+                                }, 1000)
+                            }
+                        })
+
+                    } else {
+                        fetch("/restart", {
+                            method: "post"
+                        }, () => {
+                        })
+                        setInterval(async () => {
+                            try {
+                                let res = await fetch("/check").then((res) => {
+                                    return res.json()
+                                })
+                                if (res.success) {
+                                    document.querySelector(".loading").classList.add("hidden")
+                                    setTimeout(() => {
+                                        location.href = "/home"
+                                    }, 1000)
+                                }
+                            } catch (e) {
+                                console.log(e)
+                            }
+                        }, 1000)
+                    }
+                } else if (r.error) {
+                    await UI.error(r.error)
+                    location.href = location.href
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

@@ -89,11 +89,27 @@ button.path.nav-button {
   text-decoration: none;
 }
 
-button.path.nav-button:focus-visible,
-.btn2:focus-visible,
-.btn:focus-visible {
+/* Global Focus Visible - WCAG 2.1 AA Compliant */
+*:focus-visible {
   outline: 2px solid var(--focus-outline-color);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  /* Subtle glow for better visibility */
+  border-radius: 2px;
+  /* Small radius to smooth corners */
+}
+
+/* Screen reader only - for non-visual accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* ============================================================================
@@ -344,7 +360,7 @@ aside .tab.submenu {
   /*
   color: #83ab32;
   */
-  color: silver;
+  color: var(--text-muted);
   /*
   padding-left: 5px;
   border-left: 10px solid #83ab32;
@@ -358,7 +374,7 @@ aside .tab.submenu {
   /*
   color: royalblue;
   */
-  color: silver;
+  color: var(--text-muted);
   /*
   padding-left: 5px;
   border-left: 10px solid royalblue;
@@ -404,7 +420,7 @@ body.dark .swal2-popup.loader-popup {
   align-items: center;
   padding: 10px 20px;
   text-decoration: none;
-  color: black;
+  color: var(--text-primary);
   margin-right: 10px;
 }
 
@@ -733,7 +749,7 @@ footer b {
 }
 
 .requirements .requirement-item .label {
-  color: silver;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
@@ -746,7 +762,7 @@ footer b {
 }
 
 .requirements .requirement-item .name {
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
 }
 
 .requirements .requirement-item {
@@ -914,7 +930,7 @@ body.dark .placeholder div {
 }
 
 .placeholder div {
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
 }
 
 .placeholder .btn {
@@ -1068,7 +1084,7 @@ form.search {
 }
 
 .input-form .field input {
-  color: black;
+  color: var(--text-primary);
   font-size: 12px;
   background: white;
   border: none;
@@ -1504,7 +1520,7 @@ header small {
   font-size: 14px;
   padding-top: 5px;
   display: block;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
   padding: 5px;
   display: block;
 }
@@ -1784,7 +1800,7 @@ body.dark .terminal-config-menu .terminal-config-select,
 body.dark .terminal-config-menu .terminal-config-input {
   background: white;
   border-color: rgba(255, 255, 255, 0.16);
-  color: black;
+  color: var(--text-primary);
 }
 
 body.dark .terminal-config-menu .terminal-config-color-input {
@@ -4388,4 +4404,73 @@ body.dark .logs-viewer-output {
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* ============================================================================
+   COMPONENT: GLASS TERMINAL (UX-18)
+   Wraps xterm.js in a premium glassmorphic container.
+   ============================================================================ */
+
+.pinokio-glass-terminal {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  padding: 10px;
+  /* Internal padding for aesthetic breathing room */
+  margin-top: 10px;
+}
+
+/* Light Theme overrides */
+body:not(.dark) .pinokio-glass-terminal {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme overrides */
+body.dark .pinokio-glass-terminal {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Adjust xterm inside glass container */
+.pinokio-glass-terminal .xterm-viewport {
+  background-color: transparent !important;
+}
+
+/* ============================================================================
+   MICRO-ANIMATIONS & TRANSITIONS (UX-23)
+   ============================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.item-card-hover {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+}
+
+.item-card-hover:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.dark .item-card-hover:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
 }

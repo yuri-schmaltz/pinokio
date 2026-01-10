@@ -3609,13 +3609,14 @@ body.dark .submenu {
 <body class='<%=theme%>' data-platform="<%=platform%>" data-agent="<%=agent%>">
   <header class='navheader grabbable'>
     <h1>
-      <button class='btn2' id='back' data-tippy-content="back">
+      <span class="sr-only">App View</span>
+      <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
         <div><i class="fa-solid fa-chevron-left"></i></div>
       </button>
-      <button class='btn2' id='forward' data-tippy-content="forward">
+      <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
         <div><i class="fa-solid fa-chevron-right"></i></div>
       </button>
-      <button class='btn2' id='refresh-page' data-tippy-content="refresh">
+      <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
         <div><i class="fa-solid fa-rotate-right"></i></div>
       </button>
       <div class='sep'></div>
@@ -3637,14 +3638,14 @@ body.dark .submenu {
           <div class='caption'>Forum</div>
         </a>
       </div>
-      <a class='btn2' href="/columns" data-tippy-content="split into 2 columns">
+      <a class='btn2' href="/columns" data-tippy-content="split into 2 columns" aria-label="Split into 2 columns">
         <div><i class="fa-solid fa-table-columns"></i></div>
       </a>
-      <a class='btn2' href="/rows" data-tippy-content="split into 2 rows">
+      <a class='btn2' href="/rows" data-tippy-content="split into 2 rows" aria-label="Split into 2 rows">
         <div><i class="fa-solid fa-table-columns fa-rotate-270"></i></div>
       </a>
       <button class='btn2' id='new-window' data-tippy-content="open a new window" title='open a new window'
-        data-agent="<%=agent%>">
+        aria-label="Open a new window" data-agent="<%=agent%>">
         <div><i class="fa-solid fa-plus"></i></div>
       </button>
       <button class='btn2 hidden' id='close-window' data-tippy-content='close this section'>
@@ -5452,7 +5453,8 @@ body.dark .submenu {
       document.querySelector("#delete").addEventListener("click", async (e) => {
         e.preventDefault()
         e.stopPropagation()
-        const confirmed = confirm("Are you sure you wish to delete the app?")
+        e.stopPropagation()
+        const confirmed = await UI.confirm("Are you sure you wish to delete the app?")
         if (confirmed) {
           let name = document.querySelector("#delete").getAttribute("data-name")
           console.log("delete", name)
@@ -5481,7 +5483,7 @@ body.dark .submenu {
             if (res.success) {
               location.href = "/home"
             } else if (res.error) {
-              alert(res.error)
+              await UI.error(res.error)
             }
           }
         } else {
@@ -8550,7 +8552,7 @@ body.dark .submenu {
           const changes = diffData.changes || []
 
           if (changes.length === 0) {
-            alert('No file changes detected.')
+            await UI.alert('No file changes detected.')
             return
           }
 
@@ -8660,8 +8662,8 @@ body.dark .submenu {
                 renderDiff(diffData, diffBody)
                 const resetBtn = diffViewer.querySelector('.pinokio-git-diff-revert-btn')
                 if (resetBtn && revertUrl) {
-                  resetBtn.addEventListener('click', () => {
-                    const confirmed = confirm('Reset this file to the previous version?')
+                  resetBtn.addEventListener('click', async () => {
+                    const confirmed = await UI.confirm('Reset this file to the previous version?')
                     if (confirmed) {
                       showIframeView(revertUrl)
                     }
@@ -9861,51 +9863,7 @@ body.dark .submenu {
           })()
     </script>
     <script src="/tab-idle-notifier.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        if (window.__TAURI__) {
-          const { event, window: tauriWindow, process: tauriProcess } = window.__TAURI__;
-
-          event.listen('close-requested', async () => {
-            if (typeof Swal === 'undefined') {
-              if (confirm("Exit Application? OK to Quit, Cancel to Minimize.")) {
-                await tauriProcess.exit(0);
-              } else {
-                await tauriWindow.appWindow.hide();
-              }
-              return;
-            }
-
-            const isDark = document.body.classList.contains('dark');
-            try {
-              const result = await Swal.fire({
-                title: 'Exit Application?',
-                text: "Do you really want to quit or minimize to tray?",
-                icon: 'question',
-                showDenyButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Quit',
-                denyButtonText: 'Minimize to Tray',
-                cancelButtonText: 'Cancel',
-                background: isDark ? '#1F2937' : '#FFFFFF',
-                color: isDark ? '#FFFFFF' : '#000000',
-                reverseButtons: true
-              });
-              if (result.isConfirmed) {
-                await tauriProcess.exit(0);
-              } else if (result.isDenied) {
-                await tauriWindow.appWindow.hide();
-              }
-            } catch (e) {
-              console.error("[Pinokio] Swal Error:", e);
-              if (confirm("Exit Application?")) {
-                await tauriProcess.exit(0);
-              }
-            }
-          });
-        }
-      });
-    </script>
+    <script src="/ui_service.js"></script>
 
 </body>
 

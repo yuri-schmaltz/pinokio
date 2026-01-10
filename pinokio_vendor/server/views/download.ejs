@@ -128,7 +128,7 @@
       <script src="/xterm-addon-fit.js"></script>
       <script src="/xterm-addon-web-links.js"></script>
       <script src="/xterm-theme.js"></script>
-      <script src="/sweetalert2.js"></script>
+      <script src="/ui_service.js"></script>
       <script src="/Socket.js"></script>
       <script src="/install.js"></script>
       <script src="/timeago.min.js"></script>
@@ -144,24 +144,26 @@
         <% } %>
           <header class='grabbable'>
             <h1>
-              <button class='btn2' id='back' data-tippy-content="back">
+              <span class="sr-only">Installation Manager</span>
+              <button class='btn2' id='back' data-tippy-content="back" aria-label="Go Back">
                 <div><i class="fa-solid fa-chevron-left"></i></div>
               </button>
-              <button class='btn2' id='forward' data-tippy-content="forward">
+              <button class='btn2' id='forward' data-tippy-content="forward" aria-label="Go Forward">
                 <div><i class="fa-solid fa-chevron-right"></i></div>
               </button>
-              <button class='btn2' id='refresh-page' data-tippy-content="refresh">
+              <button class='btn2' id='refresh-page' data-tippy-content="refresh" aria-label="Refresh Page">
                 <div><i class="fa-solid fa-rotate-right"></i></div>
               </button>
               <div class='flexible'></div>
-              <a class='btn2' href="/columns" data-tippy-content="split into 2 columns">
+              <a class='btn2' href="/columns" data-tippy-content="split into 2 columns"
+                aria-label="Split into 2 columns">
                 <div><i class="fa-solid fa-table-columns"></i></div>
               </a>
-              <a class='btn2' href="/rows" data-tippy-content="split into 2 rows">
+              <a class='btn2' href="/rows" data-tippy-content="split into 2 rows" aria-label="Split into 2 rows">
                 <div><i class="fa-solid fa-table-columns fa-rotate-270"></i></div>
               </a>
               <button class='btn2' id='new-window' data-tippy-content="open a new window" title='open a new window'
-                data-agent="<%=agent%>">
+                aria-label="Open a new window" data-agent="<%=agent%>">
                 <div><i class="fa-solid fa-plus"></i></div>
               </button>
               <button class='btn2 hidden' id='close-window' data-tippy-content='close this section'>
@@ -225,7 +227,7 @@
                         <h2>Installing Application</h2>
                         <p>Please wait while the installation completes. Do not close this window.</p>
                       </div>
-                      <div id='terminal'></div>
+                      <div id='terminal' class="pinokio-glass-terminal"></div>
                     </div>
                   </main>
                   <% } %>
@@ -243,7 +245,7 @@
                                 }).then((res) => {
                                   console.log(res)
                                   if (res.error) {
-                                    alert(res.error)
+                                    await UI.error(res.error)
                                     clearInterval(interval)
                                   } else if (!res.requirements_pending) {
                                     clearInterval(interval)
@@ -280,14 +282,14 @@
 	        }
                                 await install(name, url, term, socket, options)
                               } else {
-                                alert("something went wrong")
+                                await UI.error("something went wrong")
                               }
 	    <% } %>
   <% } %>
   if (document.querySelector("#del-bin")) {
                             document.querySelector("#del-bin").addEventListener("click", async (e) => {
                               console.log("del-bin")
-                              let proceed = confirm("Are you sure you wish to delete the bin folder?")
+                              let proceed = await UI.confirm("Are you sure you wish to delete the bin folder?")
                               if (proceed) {
                                 document.querySelector(".reset-bin-loading").classList.remove("hidden")
                                 document.querySelector("#del-bin").classList.add("hidden")
@@ -303,7 +305,7 @@
                                 console.log(res)
                                 document.querySelector(".reset-bin-loading").classList.add("hidden")
                                 if (res.error) {
-                                  alert(res.error)
+                                  await UI.error(res.error)
                                 } else {
                                   //location.href = location.href
                                   document.querySelector("#install-form").submit()
