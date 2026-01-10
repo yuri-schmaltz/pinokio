@@ -17,7 +17,7 @@ use std::process::Stdio;
 use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent, Manager, GlobalShortcutManager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
-use commands::process_manager::{ProcessManagerState, ProcessInfo};
+use commands::process_manager::ProcessManagerState;
 
 fn log_to_file(msg: &str) {
     use std::fs::OpenOptions;

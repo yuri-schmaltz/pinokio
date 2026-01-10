@@ -6,4 +6,4 @@ pub mod process_manager;
 
 pub use filesystem::*;
 pub use terminal::*;
-pub use process_manager::*;
+pub use process_manager::ProcessManagerState;

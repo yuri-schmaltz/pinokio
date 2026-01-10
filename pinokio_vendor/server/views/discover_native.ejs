@@ -72,35 +72,36 @@
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
-    /* Tabs */
-    .tab {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 24px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .tab button {
-        background: none;
-        border: none;
-        padding: 12px 4px;
-        font-size: 16px;
-        font-weight: 500;
-        font-family: inherit;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        color: var(--fg-muted);
-        transition: all 0.2s;
-    }
-
-    .tab button:hover {
-        color: var(--fg-body);
-    }
-
-    .tab button.selected {
-        border-bottom-color: var(--accent);
-        color: var(--accent);
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 11px;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        margin-bottom: 8px;
+    }
+
+    .badge-verified {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent);
+    }
+
+    .badge-community {
+        background: rgba(107, 114, 128, 0.1);
+        color: var(--fg-muted);
+    }
+
+    body.dark .badge-verified {
+        background: rgba(59, 130, 246, 0.2);
+    }
+
+    body.dark .badge-community {
+        background: rgba(156, 163, 184, 0.15);
     }
 
     /* Grid & Cards */
@@ -202,29 +203,18 @@
                 <!-- Removed Aside -->
                 <div class='sections'>
                     <h2 class="apps-header"><i class="fas fa-desktop"></i> Apps</h2>
-                    <input type="search" id="searchInput" class="input"
-                        placeholder="Search scripts from verified publishers">
+                    <div class="search-container">
+                        <input type="search" id="searchInput" class="input"
+                            placeholder="Search all scripts (verified & community)...">
+                    </div>
 
-                    <nav class="tab">
-                        <button id="verifiedTab" class="selected" onclick="selectTab('verified')">
-                            <i class="fas fa-check"></i> Verified scripts
-                        </button>
-                        <button id="communityTab" onclick="selectTab('community')">
-                            <i class="fas fa-shapes"></i> Community scripts
-                        </button>
-                    </nav>
-
-                    <section id="verifiedSection" class="minimalItemsContainer">
-                        <section class="minimal_items" id="featuredItems">
-                            <!-- Featured items loaded here -->
+                    <section id="unifiedSection" class="minimalItemsContainer">
+                        <section class="minimal_items" id="allItems">
+                            <!-- All items loaded here -->
                         </section>
                     </section>
 
-                    <section id="communitySection" class="minimalItemsContainer hidden">
-                        <section class="minimal_items" id="latestItems">
-                            <!-- Latest items loaded here -->
-                        </section>
-                    </section>
+
                 </div>
             </div>
         </main>
@@ -235,33 +225,13 @@
             featured: "https://pinokiocomputer.github.io/sitefeed/featured.json",
         };
 
-        var page = "app";
-        var currentTab = "verified";
-        var allFeaturedItems = [];
-        var filteredFeaturedItems = [];
-        var allLatestItems = [];
-        var filteredLatestItems = [];
+        var allItems = [];
 
         // --- Embedded JS Logic ---
-        function selectTab(tab) {
-            currentTab = tab;
-            document.getElementById('verifiedTab').classList.toggle('selected', tab === 'verified');
-            document.getElementById('communityTab').classList.toggle('selected', tab === 'community');
-
-            if (tab === 'verified') {
-                document.getElementById('verifiedSection').classList.remove('hidden');
-                document.getElementById('communitySection').classList.add('hidden');
-            } else {
-                document.getElementById('verifiedSection').classList.add('hidden');
-                document.getElementById('communitySection').classList.remove('hidden');
-            }
-            searchItems();
-        }
-
         function searchItems() {
             const searchValue = document.getElementById('searchInput').value.trim().toLowerCase();
-            const container = document.getElementById(currentTab === "verified" ? "featuredItems" : "latestItems");
-            let items = currentTab === "verified" ? allFeaturedItems : allLatestItems;
+            const container = document.getElementById("allItems");
+            let items = allItems;
 
             if (searchValue) {
                 items = items.filter(item =>
@@ -270,25 +240,29 @@
                 );
             }
 
-            renderItems(items, container, currentTab === "verified" ? 'featured' : 'latest');
+            renderItems(items, container);
         }
 
-        function renderItems(items, container, type) {
+        function renderItems(items, container) {
             container.innerHTML = '';
             items.forEach(item => {
                 const link = document.createElement('a');
                 const theme = new URLSearchParams(window.location.search).get("theme");
 
-                // Native fix: Point to local item page
                 let href = `/item_native?uri=${encodeURIComponent(item.download)}`;
                 if (theme) href += `&theme=${theme}`;
 
                 link.href = href;
                 link.className = 'card';
 
+                const badgeClass = item.type === 'verified' ? 'badge-verified' : 'badge-community';
+                const badgeIcon = item.type === 'verified' ? 'fa-check' : 'fa-shapes';
+                const badgeLabel = item.type === 'verified' ? 'Verified' : 'Community';
+
                 link.innerHTML = `
                 <div class="item">
                     <div class="col">
+                        <div class="badge ${badgeClass}"><i class="fas ${badgeIcon}"></i> ${badgeLabel}</div>
                         <div class="title">${item.title}</div>
                         <div class="description">${item.description}</div>
                     </div>
@@ -299,36 +273,35 @@
             });
         }
 
-        async function fetchFeatured() {
+        async function fetchData() {
             try {
-                const res = await fetch(Config.featured);
-                const data = await res.json();
-                allFeaturedItems = data;
-                renderItems(allFeaturedItems, document.getElementById('featuredItems'), 'featured');
-            } catch (e) { console.error(e); }
-        }
+                const [featuredRes, latestRes] = await Promise.all([
+                    fetch(Config.featured).then(res => res.json()).catch(() => []),
+                    fetch("https://api.github.com/search/repositories?q=topic:pinokio&sort=updated&direction=desc&per_page=100").then(res => res.json()).catch(() => ({ items: [] }))
+                ]);
 
-        async function fetchLatest() {
-            try {
-                const res = await fetch("https://api.github.com/search/repositories?q=topic:pinokio&sort=updated&direction=desc&per_page=100");
-                const data = await res.json();
-                allLatestItems = data.items.map(item => ({
+                const featured = featuredRes.map(item => ({ ...item, type: 'verified' }));
+                const latest = latestRes.items.map(item => ({
                     title: item.name,
                     description: item.description || "",
                     image: item.owner.avatar_url,
-                    download: item.html_url
+                    download: item.html_url,
+                    type: 'community'
                 }));
-                renderItems(allLatestItems, document.getElementById('latestItems'), 'latest');
-            } catch (e) { console.error(e); }
+
+                // Interleave or combine? Let's combine with priority to featured
+                allItems = [...featured, ...latest];
+                renderItems(allItems, document.getElementById('allItems'));
+            } catch (e) {
+                console.error(e);
+            }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             const theme = new URLSearchParams(window.location.search).get("theme");
             if (theme) document.body.classList.add(theme);
 
-            fetchFeatured();
-            fetchLatest();
-
+            fetchData();
             document.getElementById('searchInput').addEventListener('input', searchItems);
         });
     </script>

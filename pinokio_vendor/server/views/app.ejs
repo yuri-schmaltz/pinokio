@@ -3609,12 +3609,6 @@ body.dark .submenu {
 <body class='<%=theme%>' data-platform="<%=platform%>" data-agent="<%=agent%>">
   <header class='navheader grabbable'>
     <h1>
-      <a class='home' href="/home">
-        <img class='icon' src="/pinokio-black.png">
-      </a>
-      <button class='btn2' id='minimize-header' data-tippy-content="fullscreen" title='fullscreen'>
-        <div><i class="fa-solid fa-expand"></i></div>
-      </button>
       <button class='btn2' id='back' data-tippy-content="back">
         <div><i class="fa-solid fa-chevron-left"></i></div>
       </button>
@@ -3624,9 +3618,6 @@ body.dark .submenu {
       <button class='btn2' id='refresh-page' data-tippy-content="refresh">
         <div><i class="fa-solid fa-rotate-right"></i></div>
       </button>
-      <button class='btn2' id='screenshot' data-tippy-content="screen capture"><i
-          class="fa-solid fa-camera"></i></button>
-      <button class='btn2' id='inspector' data-tippy-content="X-ray mode"><i class="fa-solid fa-eye"></i></button>
       <div class='sep'></div>
       <div class='mode-selector'>
         <a class="btn2 <%=type === 'run' ? 'selected' : ''%>" href="<%=run_tab%>">
