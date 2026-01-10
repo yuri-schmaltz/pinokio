@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Details</title>
+<!-- Fonts: Manrope -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<!-- Global Styles (Tokens) -->
+<link rel="stylesheet" href="/style.css">
+
+<style>
+    :root {
+        /* Local overrides or fallbacks if style.css fails */
+        --bg-body: var(--surface-1, #ffffff);
+        --fg-body: var(--text-primary, #111827);
+        --fg-muted: var(--text-muted, #6b7280);
+        --accent: var(--color-blue-500, #3b82f6);
+        --accent-fg: #ffffff;
+        --radius-xl: 24px;
+    }
+
+    body.dark {
+        --bg-body: var(--color-gray-900, #111827);
+        --fg-body: var(--text-primary, #f3f4f6);
+        --fg-muted: var(--text-muted, #9ca3b8);
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg-body);
+        color: var(--fg-body);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: min(5vw, 40px);
+        box-sizing: border-box;
+    }
+
+    .header {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 40px;
+        align-items: start;
+        margin-bottom: 60px;
+    }
+
+    @media (max-width: 640px) {
+        .header {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            text-align: center;
+            justify-items: center;
+        }
+    }
+
+    .icon {
+        width: 140px;
+        height: 140px;
+        border-radius: var(--radius-xl);
+        object-fit: cover;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+        background: var(--surface-2, #f9fafb);
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .title {
+        font-size: clamp(24px, 4vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0;
+        line-height: 1.1;
+    }
+
+    .description {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--fg-muted);
+        margin: 0;
+        max-width: 60ch;
+    }
+
+    .actions-bar {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Primary Action Button (Install) */
+    .install-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--accent);
+        color: var(--accent-fg);
+        padding: 14px 28px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        border: 1px solid transparent;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    .install-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+        filter: brightness(1.05);
+    }
+
+    .install-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Secondary Link (Source) */
+    .link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--fg-muted);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 16px;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+    .link:hover {
+        color: var(--fg-body);
+        background: var(--surface-2, rgba(0, 0, 0, 0.05));
+    }
+
+    /* Utility */
+    .badge {
+        display: inline-flex;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent);
+        background: rgba(59, 130, 246, 0.1);
+        padding: 4px 10px;
+        border-radius: 100px;
+    }
+</style>
+
+/* Skeleton Loader System */
+.skeleton {
+background: rgba(0, 0, 0, 0.06);
+border-radius: 6px;
+overflow: hidden;
+position: relative;
+}
+
+body.dark .skeleton {
+background: rgba(255, 255, 255, 0.08);
+}
+
+.skeleton::after {
+content: "";
+position: absolute;
+top: 0;
+left: -100%;
+width: 100%;
+height: 100%;
+background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+animation: shimmer 1.5s infinite;
+}
+
+body.dark .skeleton::after {
+background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+}
+
+@keyframes shimmer {
+100% {
+left: 100%;
+}
+}
+
+.skeleton-icon {
+width: 140px;
+height: 140px;
+border-radius: var(--radius-xl);
+}
+
+.skeleton-title {
+height: 40px;
+width: 60%;
+margin-bottom: 12px;
+}
+
+.skeleton-text {
+height: 16px;
+width: 100%;
+margin-bottom: 8px;
+}
+
+.skeleton-btn {
+height: 50px;
+width: 140px;
+border-radius: 12px;
+}
+
+/* State Management */
+[data-state="loading"] .content-loaded {
+display: none;
+}
+
+[data-state="loaded"] .skeleton-view {
+display: none;
+}
+</style>
+
+<body>
+    <div class="container" data-state="loading" id="mainContainer">
+
+        <!-- Skeleton View (Loading State) -->
+        <div class="header skeleton-view">
+            <div class="skeleton skeleton-icon"></div>
+            <div class="info">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                <div class="actions-bar" style="margin-top: 24px;">
+                    <div class="skeleton skeleton-btn"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real Content (Injected via JS) -->
+        <div class="header content-loaded" id="appHeader" hidden>
+            <!-- Content injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            const uri = params.get("uri");
+            const theme = params.get("theme");
+
+            if (theme) document.body.classList.add(theme);
+
+            if (!uri) {
+                showError("No URI provided");
+                return;
+            }
+
+            // Helper to fetch details
+            try {
+                // Try featured first
+                let item = await findInFeatured(uri);
+                if (!item) {
+                    item = await findInLatest(uri);
+                }
+
+                if (item) {
+                    renderApp(item);
+                } else {
+                    // Fallback
+                    renderApp({
+                        title: uri.split('/').pop(),
+                        description: uri,
+                        image: "https://github.com/identicons/" + uri.split('/').pop() + ".png",
+                        download: uri
+                    });
+                }
+
+            } catch (e) {
+                console.error(e);
+                showError(`Error loading app: ${e.message}`);
+            }
+        });
+
+        async function findInFeatured(uri) {
+            const res = await fetch("https://pinokiocomputer.github.io/sitefeed/featured.json");
+            const data = await res.json();
+            return data.find(i => i.download === uri || i.url === uri);
+        }
+
+        async function findInLatest(uri) {
+            // simplified finding mechanism
+            return null;
+        }
+
+        function renderApp(item) {
+            const header = document.getElementById('appHeader');
+            const container = document.getElementById('mainContainer');
+
+            const html = `
+                <img class="icon" src="${item.image || '/pinokio-black.png'}" 
+                     alt="${item.title} App Icon" 
+                     onerror="this.src='/pinokio-black.png'">
+                <div class="info">
+                    <h1 class="title">${item.title}</h1>
+                    <div class="description">${item.description}</div>
+                    
+                    <div class="actions-bar">
+                        <a href="/?mode=download&uri=${encodeURIComponent(item.download || item.url)}" 
+                           class="install-btn" 
+                           aria-label="Install ${item.title}">
+                            <i class="fa-solid fa-download"></i> Install
+                        </a>
+                        <a href="${item.download || item.url}" 
+                           target="_blank" 
+                           class="link"
+                           aria-label="View Source Code on GitHub">
+                            <i class="fa-brands fa-github"></i> View Source
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            header.innerHTML = html;
+            header.hidden = false;
+
+            // Switch state
+            container.setAttribute('data-state', 'loaded');
+        }
+
+        function showError(msg) {
+            const header = document.getElementById('appHeader');
+            const container = document.getElementById('mainContainer');
+            header.innerHTML = `<div style="color:red; font-weight:bold;">${msg}</div>`;
+            header.hidden = false;
+            container.setAttribute('data-state', 'loaded');
+        }
+    </script>
+</body>
+
+</html>

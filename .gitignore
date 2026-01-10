@@ -3,5 +3,6 @@ dist
 cache
 package-lock.json
 .claude
-src-tauri/target
-src-tauri/node_modules_vendor
+backend/tauri/target
+backend/tauri/node_modules_vendor
+backend/tauri/package.json.vendor

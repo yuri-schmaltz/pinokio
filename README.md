@@ -85,12 +85,11 @@ The following environment variables can be used to configure Pinokio:
 | `PINOKIO_BROWSER_LOG` | Set to `1` to enable browser console logging to file | `0` (disabled) |
 | `PINOKIO_TEST_MODE` | Set to `1` to use mock pinokiod implementation (for testing) | `0` (disabled) |
 
-### Linux-specific Variables
+### Linux-specific Variables (Tauri)
 
 | Variable | Description |
 |----------|-------------|
-| `ELECTRON_OZONE_PLATFORM_HINT` | Hint for Ozone platform selection (e.g., `wayland`, `x11`) |
-| `ELECTRON_DISABLE_GPU` | Set to `1` to disable GPU acceleration |
+| `WEBKIT_DISABLE_COMPOSITING_MODE` | Set to `1` if you experience graphical glitches on Linux |
 | `DISPLAY` | X11 display (auto-detected) |
 | `WAYLAND_DISPLAY` | Wayland display (auto-detected) |
 
