@@ -3,6 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pinokio — Sidebar</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss: http: https:" />
     <link rel="stylesheet" href="../assets/ai-sidebar.css">
     <link rel="stylesheet" href="../assets/skeleton.css">
 </head>
@@ -19,24 +22,23 @@
                     style="color: #3b82f6;">UI</span></span>
         </div>
 
-        <nav class="ai-nav-group">
+        <nav class="ai-nav-group" role="navigation" aria-label="Core">
             <div class="ai-nav-label">Core</div>
-            <a href="#" class="ai-nav-item active">
-                <span>🏠</span> Discovery
+            <a href="#" class="ai-nav-item active" tabindex="0" aria-current="page">
+                <span aria-hidden="true">🏠</span> <span>Discovery</span>
             </a>
-            <a href="#" class="ai-nav-item">
-                <span>📚</span> Library
+            <a href="#" class="ai-nav-item" tabindex="0">
+                <span aria-hidden="true">📚</span> <span>Library</span>
             </a>
-            <a href="#" class="ai-nav-item">
-                <span>⚡</span> Environments
+            <a href="#" class="ai-nav-item" tabindex="0">
+                <span aria-hidden="true">⚡</span> <span>Environments</span>
             </a>
         </nav>
 
-        <nav class="ai-nav-group">
+        <nav class="ai-nav-group" aria-label="Status">
             <div class="ai-nav-label">Status</div>
-            <div id="status-container">
-                <!-- Will be populated by tauriBridge -->
-                <div class="skeleton-text short" style="margin: 10px;"></div>
+            <div id="status-container" aria-live="polite" aria-atomic="true">
+                <div class="skeleton-text short" style="margin: 10px;" aria-hidden="true"></div>
             </div>
         </nav>
 

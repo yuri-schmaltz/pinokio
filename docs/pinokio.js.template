@@ -1,0 +1,330 @@
+{
+  "type": "script",
+  "schema": "2.0",
+  "title": "Your App Name",
+  "description": "Professional app launcher for Pinokio with full lifecycle management, GPU detection, and real-time monitoring.",
+  "icon": "fa-solid fa-cube",
+  "author": "Your Name",
+  "homepage": "https://github.com/yourname/yourapp",
+  "version": "1.0.0",
+  "pre": [
+    {
+      "condition": "!$local.env_configured",
+      "task": [
+        {
+          "title": "Environment Setup",
+          "description": "Configure essential environment variables for your application.",
+          "prompt": [
+            {
+              "type": "text",
+              "name": "MODEL_PATH",
+              "placeholder": "e.g., ~/models or /path/to/models",
+              "value": "~/models",
+              "description": "Directory to store downloaded models (requires ~500GB for large models)"
+            },
+            {
+              "type": "text",
+              "name": "OUTPUT_PATH",
+              "placeholder": "e.g., ~/output or /path/to/output",
+              "value": "~/output",
+              "description": "Directory for application output files"
+            },
+            {
+              "type": "select",
+              "name": "GPU_MODE",
+              "options": ["auto", "cuda", "rocm", "cpu"],
+              "value": "auto",
+              "description": "GPU acceleration (auto-detect: NVIDIA CUDA, AMD ROCm, or CPU fallback)"
+            }
+          ],
+          "command": [
+            {
+              "type": "message",
+              "text": "✅ Environment configured. Press 'Install' to download models and dependencies."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tabs": [
+    {
+      "type": "rich",
+      "name": "Overview",
+      "description": "Status & Quick Actions",
+      "panel": [
+        {
+          "type": "markdown",
+          "text": "# Application Status\n\n## Running Status\n**Status:** ${info.running ? '🟢 **Running**' : info.installed ? '🟡 **Stopped**' : '🔴 **Not Installed**'}\n\n## Configuration\n- **Model Path:** `${$local.MODEL_PATH || 'Not configured'}`\n- **Output Path:** `${$local.OUTPUT_PATH || 'Not configured'}`\n- **GPU Mode:** `${$local.GPU_MODE || 'auto'}`\n- **Web UI:** ${$local.url ? `[Open in Browser](${$local.url})` : 'Not running'}\n\n## Quick Actions\nStart or stop the application below."
+        },
+        {
+          "type": "button",
+          "text": "${info.running ? '⏹ Stop Application' : '▶ Start Application'}",
+          "onclick": "${info.running ? 'stop()' : 'start()'}",
+          "style": {
+            "background": "${info.running ? '#ef4444' : '#10b981'}",
+            "fontSize": "16px",
+            "padding": "12px 24px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🌐 Open Web UI in Browser",
+          "onclick": "shell.open($local.url)",
+          "disabled": "${!$local.url}",
+          "style": {
+            "background": "#3b82f6",
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "📁 Open Output Folder",
+          "onclick": "shell.open($local.OUTPUT_PATH || '~/')",
+          "style": {
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        }
+      ]
+    },
+    {
+      "type": "rich",
+      "name": "Install",
+      "description": "Install, Update & Reset",
+      "panel": [
+        {
+          "type": "markdown",
+          "text": "## Installation Management\n\n**Current Status:** ${info.installed ? '✅ Installed' : '⏳ Not installed'}\n\n### Installation\nDownload models and configure the environment. This may take several minutes.\n\n### Update\nFetch the latest code and dependencies (preserves existing data).\n\n### Reset\nDelete all data and reinstall from scratch. **Use with caution.**"
+        },
+        {
+          "type": "button",
+          "text": "📥 Install",
+          "onclick": "install()",
+          "style": {
+            "background": "#10b981",
+            "fontSize": "16px",
+            "padding": "12px 24px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🔄 Update (Preserve Data)",
+          "onclick": "update()",
+          "disabled": "${!info.installed}",
+          "style": {
+            "background": "#f59e0b",
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🗑 Reset & Reinstall",
+          "onclick": "$local.confirm_reset",
+          "disabled": "${!info.installed}",
+          "style": {
+            "background": "#ef4444",
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        }
+      ]
+    },
+    {
+      "type": "rich",
+      "name": "Models",
+      "description": "Manage Downloaded Models",
+      "panel": [
+        {
+          "type": "markdown",
+          "text": "## Models & Assets\n\nMonitor downloaded models, cache, and checksum verification.\n\n| File | Size | Status |\n|------|------|--------|\n| model.safetensors | ${$local.model_size || '--'} | ${$local.model_valid ? '✅ Valid' : '❌ Invalid'} |\n| config.json | ${$local.config_size || '--'} | ✅ Present |\n| tokenizer.json | ${$local.tokenizer_size || '--'} | ✅ Present |\n\n**Total Cache:** ${$local.cache_total_gb || '--'} GB"
+        },
+        {
+          "type": "button",
+          "text": "🔍 Verify Models (Check Integrity)",
+          "onclick": "verify_models()",
+          "style": {
+            "background": "#8b5cf6",
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🗂 Open Model Folder",
+          "onclick": "shell.open($local.MODEL_PATH || '~/')"
+        }
+      ]
+    },
+    {
+      "type": "rich",
+      "name": "Logs",
+      "description": "View Application Logs & Debug Info",
+      "panel": [
+        {
+          "type": "markdown",
+          "text": "## Application Logs\n\nView detailed logs for debugging and monitoring.\n\n**Latest Log Entry:**\n```\n${$local.latest_log_line || 'No logs yet.'}\n```"
+        },
+        {
+          "type": "button",
+          "text": "📋 Open Logs Folder",
+          "onclick": "shell.open('${$env.HOME}/.pinokio/logs')",
+          "style": {
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "📄 View Full Log (Latest)",
+          "onclick": "shell.open('${$env.HOME}/.pinokio/logs/app.log')"
+        }
+      ]
+    },
+    {
+      "type": "rich",
+      "name": "Diagnostics",
+      "description": "System Health & Performance Checks",
+      "panel": [
+        {
+          "type": "markdown",
+          "text": "## System Diagnostics\n\n### System Resources\n- **CPU Usage:** ${$local.cpu_percent || '--'}%\n- **Memory:** ${$local.mem_used_gb || '--'} GB / ${$local.mem_total_gb || '--'} GB\n- **Free Disk Space:** ${$local.disk_free_gb || '--'} GB\n\n### GPU & Acceleration\n- **GPU Type:** ${$local.gpu_type || 'None detected'}\n- **VRAM:** ${$local.vram_gb || '--'} GB\n- **Driver:** ${$local.driver_version || 'Not detected'}\n\n### Runtime\n- **Python Version:** ${$local.python_version || '--'}\n- **Conda/Env:** ${$local.conda_env || 'Not detected'}"
+        },
+        {
+          "type": "button",
+          "text": "🔍 Run Full Smoke Test",
+          "onclick": "diagnostics()",
+          "style": {
+            "background": "#8b5cf6",
+            "fontSize": "16px",
+            "padding": "12px 24px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🐍 Check Python & Dependencies",
+          "onclick": "check_python()",
+          "style": {
+            "fontSize": "14px",
+            "padding": "10px 20px"
+          }
+        },
+        {
+          "type": "button",
+          "text": "🖥 Check GPU & VRAM",
+          "onclick": "check_gpu()"
+        }
+      ]
+    }
+  ],
+  "menu": [
+    {
+      "type": "item",
+      "text": "${info.running ? '⏸ Pause' : '▶ Resume'}",
+      "onclick": "${info.running ? 'stop()' : 'start()}",
+      "icon": "${info.running ? 'fa-solid fa-pause' : 'fa-solid fa-play'}"
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "item",
+      "text": "🌐 Open Web UI",
+      "onclick": "shell.open($local.url)",
+      "disabled": "${!$local.url}",
+      "icon": "fa-solid fa-up-right-from-square"
+    },
+    {
+      "type": "item",
+      "text": "📁 Output Folder",
+      "onclick": "shell.open($local.OUTPUT_PATH || '~/')",
+      "icon": "fa-solid fa-folder-open"
+    },
+    {
+      "type": "separator"
+    },
+    {
+      "type": "item",
+      "text": "📋 Logs",
+      "onclick": "shell.open('${$env.HOME}/.pinokio/logs')",
+      "icon": "fa-solid fa-file-lines"
+    },
+    {
+      "type": "item",
+      "text": "⚙ Settings",
+      "onclick": "settings()",
+      "icon": "fa-solid fa-gear"
+    }
+  ],
+  "commands": {
+    "install": {
+      "method": "shell.run",
+      "path": "install.json",
+      "env": {
+        "MODEL_PATH": "$local.MODEL_PATH",
+        "OUTPUT_PATH": "$local.OUTPUT_PATH",
+        "GPU_MODE": "$local.GPU_MODE"
+      }
+    },
+    "start": {
+      "method": "shell.run",
+      "path": "start.json",
+      "env": {
+        "MODEL_PATH": "$local.MODEL_PATH",
+        "OUTPUT_PATH": "$local.OUTPUT_PATH",
+        "GPU_MODE": "$local.GPU_MODE",
+        "PORT": 5000
+      },
+      "on": [
+        {
+          "event": "message",
+          "text": "Server running at",
+          "task": [
+            {
+              "type": "extract",
+              "mode": "regex",
+              "input": "message",
+              "pattern": "http://[^\\s]+",
+              "output": "$local.url"
+            }
+          ]
+        }
+      ]
+    },
+    "stop": {
+      "method": "shell.run",
+      "path": "stop.json"
+    },
+    "update": {
+      "method": "shell.run",
+      "path": "update.json"
+    },
+    "reset": {
+      "method": "shell.run",
+      "path": "reset.json",
+      "confirm": "⚠️ This will delete all data and reinstall. Continue?"
+    },
+    "diagnostics": {
+      "method": "shell.run",
+      "path": "diagnostics.json"
+    },
+    "check_python": {
+      "method": "shell.run",
+      "path": "check_python.json"
+    },
+    "check_gpu": {
+      "method": "shell.run",
+      "path": "check_gpu.json"
+    },
+    "verify_models": {
+      "method": "shell.run",
+      "path": "verify_models.json"
+    },
+    "settings": {
+      "method": "shell.run",
+      "path": "settings.json"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                   STOPPING APPLICATION                          ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "shell",
+      "command": "if pgrep -f 'python.*app.py' > /dev/null; then pkill -f 'python.*app.py' && echo '✅ Process stopped'; else echo '⚠️  Process not running'; fi"
+    },
+    {
+      "type": "message",
+      "text": "✅ Application stopped."
+    }
+  ]
+}

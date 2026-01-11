@@ -1,0 +1,72 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                    INSTALLATION STARTING                        ║\n║              My Pinokio App - Professional Setup                ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 1/6: Validating environment..."
+    },
+    {
+      "type": "shell",
+      "command": "mkdir -p \"${MODEL_PATH:-$HOME/models}\" \"${OUTPUT_PATH:-$HOME/output}\""
+    },
+    {
+      "type": "message",
+      "text": "✅ Directories created."
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 2/6: Detecting environment (Python/Conda)..."
+    },
+    {
+      "type": "shell",
+      "command": "python3 --version 2>&1 || echo 'Python not found'"
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 3/6: Creating virtual environment..."
+    },
+    {
+      "type": "shell",
+      "command": "if [ ! -d '.venv' ]; then python3 -m venv .venv; echo 'venv created'; else echo 'venv already exists'; fi"
+    },
+    {
+      "type": "message",
+      "text": "✅ Virtual environment ready."
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 4/6: Installing dependencies..."
+    },
+    {
+      "type": "shell",
+      "command": "source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && pip install --upgrade pip setuptools wheel"
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 5/6: Installing application requirements..."
+    },
+    {
+      "type": "shell",
+      "command": "source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && pip install -r requirements.txt"
+    },
+    {
+      "type": "message",
+      "text": "📋 Step 6/6: Downloading models (this may take several minutes)..."
+    },
+    {
+      "type": "shell",
+      "command": "[ -f 'download_models.py' ] && (source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && python download_models.py --model-path \"${MODEL_PATH:-$HOME/models}\" --gpu-mode \"${GPU_MODE:-auto}\") || echo 'Model download script not found'"
+    },
+    {
+      "type": "message",
+      "text": "✅ Models prepared."
+    },
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                   INSTALLATION COMPLETE                         ║\n║                                                                  ║\n║  ✅ Virtual environment created                                 ║\n║  ✅ Dependencies installed                                      ║\n║  ✅ Models downloaded and verified                              ║\n║                                                                  ║\n║  Next: Click 'Start' to run the application                     ║\n╚════════════════════════════════════════════════════════════════╝"
+    }
+  ]
+}

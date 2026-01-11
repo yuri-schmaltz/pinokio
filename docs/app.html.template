@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My App — Professional Web UI</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ws: wss: http: https:" />
+    <link rel="stylesheet" href="assets/design-system.css">
+    <style>
+        /* App-specific overrides and layouts */
+        body {
+            background-color: var(--color-bg-secondary);
+        }
+
+        .app-header {
+            background-color: var(--color-bg-primary);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 0;
+            min-height: 100vh;
+        }
+
+        .app-sidebar {
+            background-color: var(--color-bg-primary);
+            border-right: 1px solid var(--color-border);
+            padding: var(--spacing-4);
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .app-content {
+            padding: var(--spacing-6);
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .nav-section {
+            margin-bottom: var(--spacing-6);
+        }
+
+        .nav-section-title {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-3);
+            padding: var(--spacing-2) var(--spacing-3);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: all var(--transition-base);
+            margin-bottom: var(--spacing-1);
+        }
+
+        .nav-item:hover {
+            background-color: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .status-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-6);
+        }
+
+        .status-item {
+            padding: var(--spacing-4);
+            background-color: var(--color-bg-primary);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 1px solid var(--color-border);
+        }
+
+        .status-value {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .status-label {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 1024px) {
+            .app-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .app-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app-header {
+                padding: var(--spacing-3);
+            }
+
+            .app-content {
+                padding: var(--spacing-4);
+            }
+
+            .status-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div style="margin-bottom: var(--spacing-6);">
+                <h2 style="margin: 0; font-size: var(--font-size-lg);">My App</h2>
+                <p style="margin: var(--spacing-2) 0 0 0; font-size: var(--font-size-sm); color: var(--color-text-muted);">v1.0.0</p>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Menu</div>
+                <a href="#home" class="nav-item active" onclick="switchTab('home'); return false;">
+                    <span>📊</span> Home
+                </a>
+                <a href="#process" class="nav-item" onclick="switchTab('process'); return false;">
+                    <span>⚙️</span> Process
+                </a>
+                <a href="#results" class="nav-item" onclick="switchTab('results'); return false;">
+                    <span>📈</span> Results
+                </a>
+                <a href="#export" class="nav-item" onclick="switchTab('export'); return false;">
+                    <span>📥</span> Export
+                </a>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Tools</div>
+                <a href="#settings" class="nav-item" onclick="switchTab('settings'); return false;">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="#help" class="nav-item" onclick="switchTab('help'); return false;">
+                    <span>❓</span> Help
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="app-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="flex-between">
+                    <h1 style="margin: 0;">My Professional App</h1>
+                    <div class="flex">
+                        <button class="btn btn-sm btn-secondary">🌙 Dark</button>
+                        <button class="btn btn-sm btn-secondary">👤 Account</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Home Tab -->
+            <div id="tab-home" class="tab-content active">
+                <h2>Dashboard</h2>
+                <p>Welcome to your application. Monitor status and manage operations below.</p>
+
+                <div class="status-card">
+                    <div class="status-item">
+                        <div class="status-value">✅</div>
+                        <div class="status-label">Status</div>
+                        <div style="font-size: var(--font-size-sm); margin-top: var(--spacing-2);">Running</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">245</div>
+                        <div class="status-label">Processed</div>
+                        <div style="font-size: var(--font-size-sm); margin-top: var(--spacing-2);">Items</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">98%</div>
+                        <div class="status-label">Success Rate</div>
+                        <div style="font-size: var(--font-size-sm); margin-top: var(--spacing-2);">Accuracy</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value">2m 34s</div>
+                        <div class="status-label">Avg Time</div>
+                        <div style="font-size: var(--font-size-sm); margin-top: var(--spacing-2);">Per item</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--spacing-6);">
+                    <h3>Quick Actions</h3>
+                    <div class="flex" style="flex-wrap: wrap;">
+                        <button class="btn btn-primary">▶ Start Processing</button>
+                        <button class="btn btn-secondary">⏸ Pause</button>
+                        <button class="btn btn-secondary">📁 Open Output</button>
+                        <button class="btn btn-secondary">📊 View Details</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Progress</h3>
+                    <p>Current batch progress (245 of 250 items processed)</p>
+                    <div class="progress" style="margin-bottom: var(--spacing-4);">
+                        <div class="progress-bar" style="width: 98%;"></div>
+                    </div>
+                    <div class="flex-between">
+                        <small>Batch 5 of 8</small>
+                        <small style="color: var(--color-success);">🟢 On schedule</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Tab -->
+            <div id="tab-process" class="tab-content">
+                <h2>Process Configuration</h2>
+                <p>Configure your processing parameters.</p>
+
+                <div class="card" style="max-width: 600px;">
+                    <h3>Input Settings</h3>
+                    <form style="display: grid; gap: var(--spacing-4);">
+                        <div>
+                            <label for="input-file" style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-weight-semibold);">
+                                Input File
+                            </label>
+                            <input type="text" id="input-file" class="input" placeholder="Select file..." />
+                        </div>
+
+                        <div>
+                            <label for="batch-size" style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-weight-semibold);">
+                                Batch Size
+                            </label>
+                            <input type="number" id="batch-size" class="input" value="50" min="1" max="500" />
+                        </div>
+
+                        <div>
+                            <label for="gpu-mode" style="display: block; margin-bottom: var(--spacing-2); font-weight: var(--font-weight-semibold);">
+                                GPU Acceleration
+                            </label>
+                            <select class="input" id="gpu-mode">
+                                <option value="auto">Auto-detect</option>
+                                <option value="cuda">NVIDIA CUDA</option>
+                                <option value="rocm">AMD ROCm</option>
+                                <option value="cpu">CPU Only</option>
+                            </select>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4);">
+                            <button type="button" class="btn btn-primary" onclick="showToast('Settings saved!', 'success')">
+                                💾 Save
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                ↶ Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div id="tab-results" class="tab-content">
+                <h2>Processing Results</h2>
+                <p>View detailed results from recent processing runs.</p>
+
+                <div class="card" style="margin-bottom: var(--spacing-6);">
+                    <h3>Recent Runs</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Status</th>
+                                <th>Items</th>
+                                <th>Duration</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#245</td>
+                                <td><span class="badge badge-success">Complete</span></td>
+                                <td>250</td>
+                                <td>12m 34s</td>
+                                <td>2025-01-11</td>
+                            </tr>
+                            <tr>
+                                <td>#244</td>
+                                <td><span class="badge badge-success">Complete</span></td>
+                                <td>250</td>
+                                <td>11m 45s</td>
+                                <td>2025-01-10</td>
+                            </tr>
+                            <tr>
+                                <td>#243</td>
+                                <td><span class="badge badge-warning">Partial</span></td>
+                                <td>200/250</td>
+                                <td>10m 20s</td>
+                                <td>2025-01-09</td>
+                            </tr>
+                            <tr>
+                                <td>#242</td>
+                                <td><span class="badge badge-error">Failed</span></td>
+                                <td>50</td>
+                                <td>2m 15s</td>
+                                <td>2025-01-08</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3>Performance Metrics</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4);">
+                        <div>
+                            <small style="color: var(--color-text-muted);">Average Processing Speed</small>
+                            <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-top: var(--spacing-2);">3.2 items/sec</div>
+                        </div>
+                        <div>
+                            <small style="color: var(--color-text-muted);">Success Rate (last 7 days)</small>
+                            <div style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--color-success); margin-top: var(--spacing-2);">99.2%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="tab-export" class="tab-content">
+                <h2>Export Results</h2>
+                <p>Download and export your processing results in various formats.</p>
+
+                <div class="card" style="max-width: 600px;">
+                    <h3>Export Options</h3>
+                    <div style="display: grid; gap: var(--spacing-4);">
+                        <div style="padding: var(--spacing-4); background-color: var(--color-bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--spacing-2) 0;">CSV Export</h4>
+                            <p style="margin: 0 0 var(--spacing-3) 0; font-size: var(--font-size-sm);">Spreadsheet format for analysis</p>
+                            <button class="btn btn-sm btn-primary">📥 Download CSV</button>
+                        </div>
+
+                        <div style="padding: var(--spacing-4); background-color: var(--color-bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--spacing-2) 0;">JSON Export</h4>
+                            <p style="margin: 0 0 var(--spacing-3) 0; font-size: var(--font-size-sm);">Structured data format for integration</p>
+                            <button class="btn btn-sm btn-primary">📥 Download JSON</button>
+                        </div>
+
+                        <div style="padding: var(--spacing-4); background-color: var(--color-bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                            <h4 style="margin: 0 0 var(--spacing-2) 0;">PDF Report</h4>
+                            <p style="margin: 0 0 var(--spacing-3) 0; font-size: var(--font-size-sm);">Professional summary report</p>
+                            <button class="btn btn-sm btn-primary">📥 Generate PDF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="tab-content">
+                <h2>Settings</h2>
+                <p>Configure application preferences and options.</p>
+
+                <div class="card" style="max-width: 600px;">
+                    <h3>General Settings</h3>
+                    <form style="display: grid; gap: var(--spacing-4);">
+                        <div>
+                            <label style="display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer;">
+                                <input type="checkbox" checked />
+                                <span>Enable notifications</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label style="display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer;">
+                                <input type="checkbox" checked />
+                                <span>Auto-save results</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label style="display: flex; align-items: center; gap: var(--spacing-2); cursor: pointer;">
+                                <input type="checkbox" />
+                                <span>Enable analytics</span>
+                            </label>
+                        </div>
+
+                        <div style="padding-top: var(--spacing-4); border-top: 1px solid var(--color-border);">
+                            <button type="button" class="btn btn-primary" onclick="showToast('Settings updated!', 'success')">
+                                ✅ Save Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Tab -->
+            <div id="tab-help" class="tab-content">
+                <h2>Help & Documentation</h2>
+                <p>Get help with your application.</p>
+
+                <div class="card" style="margin-bottom: var(--spacing-6);">
+                    <h3>Frequently Asked Questions</h3>
+                    <details style="margin-bottom: var(--spacing-4);">
+                        <summary style="cursor: pointer; font-weight: var(--font-weight-semibold);">How do I get started?</summary>
+                        <p style="margin-top: var(--spacing-2); color: var(--color-text-secondary);">Simply upload your input file, configure the settings, and click "Start Processing".</p>
+                    </details>
+
+                    <details style="margin-bottom: var(--spacing-4);">
+                        <summary style="cursor: pointer; font-weight: var(--font-weight-semibold);">What formats are supported?</summary>
+                        <p style="margin-top: var(--spacing-2); color: var(--color-text-secondary);">We support CSV, JSON, Excel, and plain text formats.</p>
+                    </details>
+
+                    <details>
+                        <summary style="cursor: pointer; font-weight: var(--font-weight-semibold);">How long does processing take?</summary>
+                        <p style="margin-top: var(--spacing-2); color: var(--color-text-secondary);">Processing time depends on file size and complexity, typically 5-30 minutes per batch.</p>
+                    </details>
+                </div>
+
+                <div class="card">
+                    <h3>Contact & Support</h3>
+                    <p>For additional help, contact us at <strong>support@example.com</strong></p>
+                    <a href="https://docs.example.com" target="_blank" class="btn btn-secondary btn-sm">📖 Full Documentation</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show selected tab
+            const tab = document.getElementById(`tab-${tabName}`);
+            if (tab) tab.classList.add('active');
+
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item')?.classList.add('active');
+        }
+
+        // Toast notification functionality
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Demo: Show welcome message
+        document.addEventListener('DOMContentLoaded', () => {
+            showToast('✅ Application loaded successfully!', 'success');
+        });
+    </script>
+</body>
+</html>

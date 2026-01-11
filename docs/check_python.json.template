@@ -1,0 +1,28 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                 CHECKING PYTHON ENVIRONMENT                     ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "🐍 Python Version:"
+    },
+    {
+      "type": "shell",
+      "command": "python3 --version"
+    },
+    {
+      "type": "message",
+      "text": "📦 Installed Core Packages:"
+    },
+    {
+      "type": "shell",
+      "command": "pip list | grep -E 'torch|tensorflow|numpy|scipy|pillow|requests|flask|fastapi|pydantic' || echo '⚠️  Core packages not found'"
+    },
+    {
+      "type": "message",
+      "text": "✅ Python check complete."
+    }
+  ]
+}

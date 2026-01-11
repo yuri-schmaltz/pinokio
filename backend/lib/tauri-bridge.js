@@ -39,8 +39,24 @@ async function listen(event, callback) {
 async function runCommand(cmd, args = [], cwd = null, onStdout = null, onStderr = null) {
     const windowId = `win_${Math.random().toString(36).slice(2, 9)}`;
 
-    if (onStdout) listen(`terminal:stdout:${windowId}`, (e) => onStdout(e.payload));
-    if (onStderr) listen(`terminal:stderr:${windowId}`, (e) => onStderr(e.payload));
+    const subscribe = async (eventName, handler) => {
+        try {
+            return await listen(eventName, (e) => handler(e.payload ?? e));
+        } catch (_) {
+            // noop: listener may not exist; fallback handled below
+            return () => {};
+        }
+    };
+
+    // Prefer namespaced events; fallback to global events used by current Tauri backend
+    if (onStdout) {
+        await subscribe(`terminal:stdout:${windowId}`, onStdout);
+        await subscribe('terminal:stdout', onStdout);
+    }
+    if (onStderr) {
+        await subscribe(`terminal:stderr:${windowId}`, onStderr);
+        await subscribe('terminal:stderr', onStderr);
+    }
 
     return invoke('run_command', { cmd, args, cwd, windowId });
 }
@@ -134,24 +150,23 @@ if (typeof window !== 'undefined') {
 }
 
 // Export for module context
-if (typeof module !== 'object') {
-    var module = {};
+if (typeof module !== 'undefined' && module && module.exports) {
+    module.exports = {
+        isTauri,
+        invoke,
+        listen,
+        runCommand,
+        killProcess,
+        listDirectory,
+        readFile,
+        writeFile,
+        pathExists,
+        getHomeDir,
+        createDir,
+        removePath,
+        getProcesses,
+        detectConda,
+        getSystemResources,
+        electronAPI
+    };
 }
-module.exports = {
-    isTauri,
-    invoke,
-    listen,
-    runCommand,
-    killProcess,
-    listDirectory,
-    readFile,
-    writeFile,
-    pathExists,
-    getHomeDir,
-    createDir,
-    removePath,
-    getProcesses,
-    detectConda,
-    getSystemResources,
-    electronAPI
-};

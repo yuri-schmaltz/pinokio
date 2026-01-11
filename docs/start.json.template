@@ -1,0 +1,28 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                  STARTING APPLICATION                           ║\n║              My Pinokio App - Web UI Server                     ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "🔍 Detecting GPU acceleration (GPU_MODE: ${GPU_MODE:-auto})..."
+    },
+    {
+      "type": "shell",
+      "command": "python3 -c \"import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); print(f'Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \\\"CPU\\\"}')\" 2>/dev/null || echo 'PyTorch check skipped'"
+    },
+    {
+      "type": "message",
+      "text": "✅ Environment ready."
+    },
+    {
+      "type": "message",
+      "text": "🚀 Starting web server on port ${PORT:-5000}..."
+    },
+    {
+      "type": "shell",
+      "command": "source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && python app.py --host 0.0.0.0 --port ${PORT:-5000} --model-path \"${MODEL_PATH:-$HOME/models}\" --output-path \"${OUTPUT_PATH:-$HOME/output}\""
+    }
+  ]
+}

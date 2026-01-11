@@ -1,0 +1,32 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                   UPDATING APPLICATION                          ║\n║                  (Preserving Data & Cache)                      ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "📋 Pulling latest code from repository..."
+    },
+    {
+      "type": "shell",
+      "command": "git pull origin main 2>/dev/null || echo 'Git pull skipped (not a git repo)'"
+    },
+    {
+      "type": "message",
+      "text": "📋 Updating Python dependencies..."
+    },
+    {
+      "type": "shell",
+      "command": "source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && pip install --upgrade -r requirements.txt"
+    },
+    {
+      "type": "message",
+      "text": "✅ Update complete."
+    },
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║  ✅ Application updated successfully                            ║\n║  ℹ️  Models and cached data preserved                          ║\n║  📋 Restart the application to apply changes                   ║\n╚════════════════════════════════════════════════════════════════╝"
+    }
+  ]
+}

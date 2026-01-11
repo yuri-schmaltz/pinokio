@@ -1,0 +1,36 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                  CHECKING GPU & ACCELERATION                    ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "🎮 GPU Detection:"
+    },
+    {
+      "type": "shell",
+      "command": "lspci 2>/dev/null | grep -i 'vga\\|3d\\|nvidia\\|amd' || echo 'No GPU detected via lspci'"
+    },
+    {
+      "type": "message",
+      "text": "🔧 NVIDIA CUDA Check:"
+    },
+    {
+      "type": "shell",
+      "command": "nvcc --version 2>/dev/null || echo '⚠️  NVIDIA CUDA toolkit not found'"
+    },
+    {
+      "type": "message",
+      "text": "📊 PyTorch GPU Support:"
+    },
+    {
+      "type": "shell",
+      "command": "python3 -c \"import torch; print(f'PyTorch version: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}'); if torch.cuda.is_available(): print(f'Device: {torch.cuda.get_device_name(0)}'); print(f'VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f}GB')\" 2>/dev/null || echo '⚠️  PyTorch not installed or not configured'"
+    },
+    {
+      "type": "message",
+      "text": "✅ GPU check complete."
+    }
+  ]
+}

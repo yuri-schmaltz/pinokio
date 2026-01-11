@@ -70,6 +70,13 @@
     transform: translateX(4px);
 }
 
+/* Accessible focus indicator */
+.ai-nav-item:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+    background: rgba(37, 99, 235, 0.12);
+}
+
 .ai-nav-item.active {
     background: rgba(37, 99, 235, 0.15);
     color: #60a5fa;
@@ -93,4 +100,11 @@
 .ai-status-val {
     color: #60a5fa;
     font-weight: 600;
+}
+
+/* High-contrast mode hook */
+@media (prefers-contrast: more) {
+    .ai-nav-item:focus-visible {
+        outline: 3px solid #3b82f6;
+    }
 }

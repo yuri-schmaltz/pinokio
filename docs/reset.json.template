@@ -1,0 +1,52 @@
+{
+  "run": [
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                    FACTORY RESET WARNING                        ║\n║                                                                  ║\n║  ⚠️  This will delete:                                          ║\n║  • Virtual environment (.venv)                                  ║\n║  • Downloaded models                                             ║\n║  • Cache and temporary files                                    ║\n║                                                                  ║\n║  YOUR SOURCE CODE AND OUTPUT WILL BE PRESERVED                 ║\n╚════════════════════════════════════════════════════════════════╝"
+    },
+    {
+      "type": "message",
+      "text": "⏹️  Stopping any running processes..."
+    },
+    {
+      "type": "shell",
+      "command": "pkill -f 'python.*app.py' 2>/dev/null || true"
+    },
+    {
+      "type": "message",
+      "text": "🗑️  Removing virtual environment..."
+    },
+    {
+      "type": "shell",
+      "command": "rm -rf .venv && echo '✅ venv deleted'"
+    },
+    {
+      "type": "message",
+      "text": "🗑️  Clearing cache directories..."
+    },
+    {
+      "type": "shell",
+      "command": "rm -rf __pycache__ .cache .pytest_cache build dist *.egg-info 2>/dev/null || true && echo '✅ Cache cleared'"
+    },
+    {
+      "type": "message",
+      "text": "📋 Reinitializing environment..."
+    },
+    {
+      "type": "shell",
+      "command": "mkdir -p \"${MODEL_PATH:-$HOME/models}\" \"${OUTPUT_PATH:-$HOME/output}\" && python3 -m venv .venv && echo '✅ Fresh venv created'"
+    },
+    {
+      "type": "message",
+      "text": "📋 Installing base dependencies..."
+    },
+    {
+      "type": "shell",
+      "command": "source .venv/bin/activate 2>/dev/null || source .venv/Scripts/activate 2>/dev/null && pip install --upgrade pip setuptools wheel"
+    },
+    {
+      "type": "message",
+      "text": "╔════════════════════════════════════════════════════════════════╗\n║                     RESET COMPLETE                              ║\n║                                                                  ║\n║  ✅ Application reset to factory state                          ║\n║  ✅ Source code preserved                                        ║\n║  ✅ Output files preserved                                       ║\n║                                                                  ║\n║  Next: Click 'Install' to download models and dependencies      ║\n╚════════════════════════════════════════════════════════════════╝"
+    }
+  ]
+}
