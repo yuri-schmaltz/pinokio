@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "description": "Backing up output files",
+      "type": "shell",
+      "command": "cd {{$home}} && if [ -d 'output' ]; then tar -czf output_backup_$(date +%s).tar.gz output/ 2>/dev/null || true; fi && echo 'Backup created'"
+    },
+    {
+      "description": "Removing virtual environment",
+      "type": "shell",
+      "command": "cd {{$home}} && rm -rf .venv"
+    },
+    {
+      "description": "Clearing cache files",
+      "type": "shell",
+      "command": "cd {{$home}} && find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && find . -name '*.pyc' -delete 2>/dev/null || true"
+    },
+    {
+      "description": "Factory reset completed",
+      "type": "shell",
+      "command": "echo '✅ Reset complete! Run install.json to set up again.'"
+    }
+  ]
+}

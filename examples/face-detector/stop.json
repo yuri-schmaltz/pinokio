@@ -1,0 +1,14 @@
+{
+  "steps": [
+    {
+      "description": "Stopping Face Detector server",
+      "type": "shell",
+      "command": "pkill -f 'python.*app.py' 2>/dev/null || pkill -f 'python3.*app.py' 2>/dev/null || echo 'Process not running'"
+    },
+    {
+      "description": "Verifying shutdown",
+      "type": "shell",
+      "command": "sleep 2 && if pgrep -f 'python.*app.py' > /dev/null; then echo '⚠️ Process still running'; else echo '✅ Server stopped'; fi"
+    }
+  ]
+}
