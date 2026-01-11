@@ -505,10 +505,10 @@ body.dark .browser-options-row {
         }
       </style>
       <script src="/window_storage.js"></script>
-      <script src="/hotkeys.min.js"></script>
+      <script src="/hotkeys.min.js" defer></script>
       <script src="/sweetalert2.js"></script>
-      <script src="/noty.js"></script>
-      <script src="/notyq.js"></script>
+      <script src="/noty.js" defer></script>
+      <script src="/notyq.js" defer></script>
       <script src="/xterm.js"></script>
       <script src="/xterm-addon-fit.js"></script>
       <script src="/xterm-addon-web-links.js"></script>
@@ -517,21 +517,21 @@ body.dark .browser-options-row {
       <script src="/install.js"></script>
       <script src="/common.js"></script>
       <script src="/nav.js"></script>
-      <script src="/fuse.js"></script>
-      <script src="/report.js"></script>
-      <script src="/popper.min.js"></script>
-      <script src="/tippy-bundle.umd.min.js"></script>
-      <script src="/filepond-plugin-file-validate-type.min.js"></script>
-      <script src="/filepond-plugin-image-exif-orientation.min.js"></script>
-      <script src="/filepond-plugin-image-preview.min.js"></script>
-      <script src="/filepond-plugin-image-edit.min.js"></script>
-      <script src="/filepond-plugin-image-crop.min.js"></script>
-      <script src="/filepond-plugin-image-resize.min.js"></script>
-      <script src="/filepond-plugin-image-transform.min.js"></script>
-      <script src="/filepond.min.js"></script>
-      <script src="/fscreator.js"></script>
-      <script src="/fseditor.js"></script>
-      <script src="/urldropdown.js"></script>
+      <script src="/fuse.js" defer></script>
+      <script src="/report.js" defer></script>
+      <script src="/popper.min.js" defer></script>
+      <script src="/tippy-bundle.umd.min.js" defer></script>
+      <script src="/filepond-plugin-file-validate-type.min.js" defer></script>
+      <script src="/filepond-plugin-image-exif-orientation.min.js" defer></script>
+      <script src="/filepond-plugin-image-preview.min.js" defer></script>
+      <script src="/filepond-plugin-image-edit.min.js" defer></script>
+      <script src="/filepond-plugin-image-crop.min.js" defer></script>
+      <script src="/filepond-plugin-image-resize.min.js" defer></script>
+      <script src="/filepond-plugin-image-transform.min.js" defer></script>
+      <script src="/filepond.min.js" defer></script>
+      <script src="/fscreator.js" defer></script>
+      <script src="/fseditor.js" defer></script>
+      <script src="/urldropdown.js" defer></script>
 </head>
 
 <body class='<%=theme%>' data-agent="<%=agent%>">
@@ -664,7 +664,7 @@ body.dark .browser-options-row {
                         <h3>
                           <div class='item-icon'>
                             <% if (item.icon) { %>
-                              <img src="<%=item.icon%>" alt="<%=item.name%> icon"
+                              <img src="<%=item.icon%>" alt="<%=item.name%> icon" loading="lazy"
                                 onerror="this.src='/pinokio-black.png'" />
                               <% } else { %>
                                 <i class="fa-regular fa-folder"></i>
@@ -780,7 +780,7 @@ body.dark .browser-options-row {
                               <h3>
                                 <div class='item-icon'>
                                   <% if (item.icon) { %>
-                                    <img src="<%=item.icon%>" alt="<%=item.name%> icon"
+                                    <img src="<%=item.icon%>" alt="<%=item.name%> icon" loading="lazy"
                                       onerror="this.src='/pinokio-black.png'" />
                                     <% } else { %>
                                       <i class="fa-regular fa-folder"></i>

@@ -4474,3 +4474,143 @@ main.fade-in {
 body.dark .item-card-hover:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
 }
+
+/* ============================================================================
+   ONDA 5: RESPONSIVIDADE MOBILE & TOUCH ACCESSIBILITY
+   ============================================================================ */
+
+/* --- Touch Targets (WCAG 2.1 AAA - 44x44px minimum) --- */
+@media (pointer: coarse) {
+
+  .btn,
+  .btn2,
+  button,
+  a.btn,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+
+  .navheader .btn2 {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  /* Increase tap area for icon buttons */
+  .navheader .btn2 i {
+    font-size: 18px;
+  }
+}
+
+/* --- Glassmorphism Fallback for Unsupported Browsers --- */
+@supports not (backdrop-filter: blur(10px)) {
+
+  .pinokio-glass-terminal,
+  .glass-card,
+  .settings-card {
+    background: rgba(30, 30, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  body.light .pinokio-glass-terminal,
+  body.light .glass-card,
+  body.light .settings-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* --- Small Mobile (≤480px) --- */
+@media screen and (max-width: 480px) {
+  .navheader {
+    padding: 8px 10px;
+  }
+
+  .navheader .btn2 {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .urlbar {
+    max-width: 120px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .line.align-top {
+    padding: 12px;
+  }
+
+  .item-icon img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .title span {
+    font-size: 14px;
+  }
+
+  .uri {
+    font-size: 11px;
+  }
+
+  /* Stack action buttons vertically on small screens */
+  .line .actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* --- Tablet (481px - 768px) --- */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .line.align-top {
+    padding: 15px;
+  }
+
+  .item-icon img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* --- Reduced Motion Preference --- */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  main.fade-in {
+    animation: none;
+    opacity: 1;
+  }
+
+  .item-card-hover:hover {
+    transform: none;
+  }
+}
+
+/* --- Safe Area Insets for Notched Devices --- */
+@supports (padding: env(safe-area-inset-top)) {
+  .navheader {
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+
+  main {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
