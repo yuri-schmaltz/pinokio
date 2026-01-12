@@ -5,15 +5,17 @@
   "homepage": "https://pinokio.co",
   "description": "Pinokio - AI-first application launcher (Tauri Edition)",
   "scripts": {
-    "dev": "node backend/scripts/sync-vendor.js && cd backend/tauri && cargo tauri dev",
+    "dev": "cd backend/tauri && cargo tauri dev",
     "build": "node backend/scripts/sync-vendor.js && cd backend/tauri && cargo tauri build",
     "tauri": "tauri",
+    "sync": "node backend/scripts/sync-vendor.js",
     "postinstall": "node backend/scripts/sync-vendor.js",
     "test": "npm run test:smoke",
-    "test:smoke": "mocha \"tests/smoke/**/*.test.js\"",
+    "test:smoke": "./tests/smoke.sh",
     "test:e2e": "playwright test -c tests/playwright.config.js",
     "lint": "eslint *.js backend/scripts/*.js tests/**/*.js",
-    "bench": "node -e \"console.error('bench: não configurado neste repo'); process.exit(1)\""
+    "bench": "node -e \"console.error('bench: não configurado neste repo'); process.exit(1)\"",
+    "cleanup": "./scripts/cleanup.sh"
   },
   "license": "MIT",
   "dependencies": {
