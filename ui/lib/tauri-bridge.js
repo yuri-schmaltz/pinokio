@@ -43,10 +43,12 @@ async function runCommand(cmd, args = [], cwd = null, onStdout = null, onStderr 
         try {
             return await listen(eventName, (e) => handler(e.payload ?? e));
         } catch (_) {
+            // noop: listener may not exist; fallback handled below
             return () => {};
         }
     };
 
+    // Prefer namespaced events; fallback to global events used by current Tauri backend
     if (onStdout) {
         await subscribe(`terminal:stdout:${windowId}`, onStdout);
         await subscribe('terminal:stdout', onStdout);
